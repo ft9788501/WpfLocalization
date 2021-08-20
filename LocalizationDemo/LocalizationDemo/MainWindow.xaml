@@ -19,14 +19,18 @@
                 <TextBlock x:Name="textblock1"/>
                 <TextBlock x:Name="textblock2"/>
             </StackPanel>
+            <StackPanel  Background="LightBlue">
+                <TextBlock Text="String Format"/>
+                <TextBlock x:Name="textblock3"/>
+            </StackPanel>
         </StackPanel>
-        <StackPanel Width="100" VerticalAlignment="Top" HorizontalAlignment="Right">
-            <ComboBox Width="100" Height="25" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged">
+        <StackPanel Width="150" VerticalAlignment="Top" HorizontalAlignment="Right">
+            <ComboBox Width="150" Height="25" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged">
                 <ComboBoxItem Content="en-US"/>
                 <ComboBoxItem Content="zh-CN"/>
             </ComboBox>
-            <Button Width="100" Height="25" Content="{properties:I18N Key=ShowNewWindow}" Click="Button_Click"/>
-            <Button Width="100" Height="25" Content="{properties:I18N Key=ExportJson}" Click="Button_Click_1"/>
+            <Button Width="150" Height="25" Content="{properties:I18N Key=ShowNewWindow}" Click="Button_Click"/>
+            <Button Width="150" Height="25" Content="{properties:I18N Key=MessageBox}" Click="Button_Click_1"/>
         </StackPanel>
     </Grid>
 </Window>

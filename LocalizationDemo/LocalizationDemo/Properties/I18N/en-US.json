@@ -1,1 +1,1 @@
-﻿[ "Title:title", "Name:name", "Age:12", "NewWindowTitle:newWindowTitle", "ShowNewWindow:Show New Window", "ExportJson:Export Json", "Success:Success" ]
+["Title:title","Name:name","Age:12","MessageBox:MessageBox","ShowNewWindow:Show New Window","NewWindowTitle:newWindowTitle","Success:Success","String1:this is string start","String2:this is string end"]

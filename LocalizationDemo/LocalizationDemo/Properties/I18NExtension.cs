@@ -10,60 +10,13 @@ namespace LocalizationDemo.Properties
 {
     public class I18NExtension : MarkupExtension
     {
-        class CultureChangedEventManager : WeakEventManager
-        {
-            private static CultureChangedEventManager CurrentManager
-            {
-                get
-                {
-                    CultureChangedEventManager manager = (CultureChangedEventManager)GetCurrentManager(typeof(CultureChangedEventManager));
-                    if (manager == null)
-                    {
-                        manager = new CultureChangedEventManager();
-                        SetCurrentManager(typeof(CultureChangedEventManager), manager);
-                    }
-                    return manager;
-                }
-            }
-
-            public static void AddListener(IWeakEventListener listener)
-            {
-                CurrentManager.ProtectedAddListener(null, listener);
-            }
-
-            public static void RemoveListener(IWeakEventListener listener)
-            {
-                CurrentManager.ProtectedRemoveListener(null, listener);
-            }
-
-            protected override void StartListening(object source)
-            {
-                I18N.CultureChanged += OnCultureChanged;
-            }
-
-            protected override void StopListening(object source)
-            {
-                I18N.CultureChanged -= OnCultureChanged;
-            }
-
-            private void OnCultureChanged(object sender, EventArgs e)
-            {
-                DeliverEvent(null, e);
-            }
-        }
-        class BindingData : INotifyPropertyChanged, IWeakEventListener
+        class BindingData : I18NWeakEventListenerAbstract, INotifyPropertyChanged
         {
             private readonly I18N.I18NKeys key;
 
             public BindingData(I18N.I18NKeys key)
             {
                 this.key = key;
-                CultureChangedEventManager.AddListener(this);
-            }
-
-            ~BindingData()
-            {
-                CultureChangedEventManager.RemoveListener(this);
             }
 
             public string Value
@@ -80,16 +33,11 @@ namespace LocalizationDemo.Properties
 
             #endregion
 
-            #region IWeakEventListener
+            #region I18NWeakEventListenerAbstract
 
-            public bool ReceiveWeakEvent(Type managerType, object sender, EventArgs e)
+            public override void ReceiveWeakEvent()
             {
-                if (managerType == typeof(CultureChangedEventManager))
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
-                    return true;
-                }
-                return false;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
             }
 
             #endregion

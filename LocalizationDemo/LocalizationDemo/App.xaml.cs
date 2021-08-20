@@ -14,9 +14,10 @@ namespace LocalizationDemo
     /// </summary>
     public partial class App : Application
     {
-        public App() 
+        public App()
         {
-            I18N.SaveAsJson("x");
+            I18N.SaveAsJson(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @$"..\..\..\Properties\I18N\en-US.json"));
+            //I18N.SaveAsJson("x");
         }
     }
 }

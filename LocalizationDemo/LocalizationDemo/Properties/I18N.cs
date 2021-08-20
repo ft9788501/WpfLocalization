@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
@@ -17,10 +18,44 @@ namespace LocalizationDemo.Properties
             [Description("title")] Title,
             [Description("name")] Name,
             [Description("12")] Age,
-            [Description("Export Json")] ExportJson,
+            [Description("MessageBox")] MessageBox,
             [Description("Show New Window")] ShowNewWindow,
             [Description("newWindowTitle")] NewWindowTitle,
-            [Description("Success")] Success
+            [Description("Success")] Success,
+            [Description("this is string start")] String1,
+            [Description("this is string end")] String2,
+        }
+
+        class BindingData : I18NWeakEventListenerAbstract
+        {
+            private readonly I18NKeys key;
+            private readonly Action<string> actionWithArg;
+            private readonly Action action;
+
+            public BindingData(I18NKeys key, Action<string> actionWithArg)
+            {
+                this.key = key;
+                this.actionWithArg = actionWithArg;
+                ReceiveWeakEvent();
+            }
+            public BindingData(Action action)
+            {
+                this.action = action;
+                ReceiveWeakEvent();
+            }
+            ~BindingData()
+            {
+            }
+
+            #region I18NWeakEventListenerAbstract
+
+            public override void ReceiveWeakEvent()
+            {
+                actionWithArg?.Invoke(key.GetLocalizationString());
+                action?.Invoke();
+            }
+
+            #endregion
         }
 
         private const char SPLIT = ':';
@@ -28,6 +63,7 @@ namespace LocalizationDemo.Properties
         public static event EventHandler CultureChanged;
 
         private static Dictionary<I18NKeys, string> i18nMap = new Dictionary<I18NKeys, string>();
+        private static Dictionary<object, List<BindingData>> bindingDataMap = new Dictionary<object, List<BindingData>>();
 
         static I18N()
         {
@@ -46,10 +82,30 @@ namespace LocalizationDemo.Properties
         {
             return i18nMap[i18NKeys];
         }
-        public static void BindingLocalizationString(this I18NKeys i18NKeys, Action<string> action)
+
+        public static void BindingLocalizationString(this I18NKeys i18NKeys, object sender, Action<string> action)
         {
-            var value = i18nMap[i18NKeys];
-            action?.Invoke(value);
+            if (!bindingDataMap.TryGetValue(sender, out List<BindingData> bindingDatas))
+            {
+                bindingDatas = new List<BindingData>();
+                bindingDataMap.Add(sender, bindingDatas);
+            }
+            bindingDatas.Add(new BindingData(i18NKeys, action));
+        }
+
+        public static void BindingLocalizationString(object sender, Action action)
+        {
+            if (!bindingDataMap.TryGetValue(sender, out List<BindingData> bindingDatas))
+            {
+                bindingDatas = new List<BindingData>();
+                bindingDataMap.Add(sender, bindingDatas);
+            }
+            bindingDatas.Add(new BindingData(action));
+        }
+
+        public static void RemoveBinding(object sender)
+        {
+            bindingDataMap.Remove(sender);
         }
 
         public static bool SaveAsJson(string path)

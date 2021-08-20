@@ -1,6 +1,7 @@
 ﻿using LocalizationDemo.Properties;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,8 +25,9 @@ namespace LocalizationDemo
         public MainWindow()
         {
             InitializeComponent();
-            I18N.I18NKeys.Name.BindingLocalizationString(x => textblock1.Text = x);
-            I18N.I18NKeys.Age.BindingLocalizationString(x => textblock2.Text = x);
+            I18N.I18NKeys.Name.BindingLocalizationString(this, x => textblock1.Text = x);
+            I18N.I18NKeys.Age.BindingLocalizationString(this, x => textblock2.Text = x);
+            I18N.BindingLocalizationString(this, () => textblock3.Text = $"{I18N.I18NKeys.String1.GetLocalizationString()}+{I18N.I18NKeys.String2.GetLocalizationString()}");
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -36,7 +38,7 @@ namespace LocalizationDemo
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Window window = new Window()
+            NewWindow window = new NewWindow()
             {
                 Width = 550,
                 Height = 100,
@@ -47,11 +49,12 @@ namespace LocalizationDemo
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            //var result = I18N.Instance.SaveAsJson(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @$"Properties\I18N\en-US.json"));
-            //if (result)
-            {
-                MessageBox.Show(I18N.I18NKeys.Success.GetLocalizationString());
-            }
+            MessageBox.Show(I18N.I18NKeys.Success.GetLocalizationString());
+        }
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            I18N.RemoveBinding(this);
         }
     }
 }
