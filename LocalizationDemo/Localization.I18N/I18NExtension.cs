@@ -6,15 +6,15 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace LocalizationDemo.Properties
+namespace Localization.I18N
 {
     public class I18NExtension : MarkupExtension
     {
         class BindingData : I18NWeakEventListenerAbstract, INotifyPropertyChanged
         {
-            private readonly I18N.I18NKeys key;
+            private readonly I18NKeys key;
 
-            public BindingData(I18N.I18NKeys key)
+            public BindingData(I18NKeys key)
             {
                 this.key = key;
             }
@@ -44,7 +44,7 @@ namespace LocalizationDemo.Properties
         }
 
         [ConstructorArgument(nameof(Key))]
-        public I18N.I18NKeys Key { get; set; }
+        public I18NKeys Key { get; set; }
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {

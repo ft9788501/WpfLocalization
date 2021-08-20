@@ -1,4 +1,4 @@
-﻿using LocalizationDemo.Properties;
+﻿using Localization.I18N;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,7 +22,8 @@ namespace LocalizationDemo
         public NewWindow()
         {
             InitializeComponent();
-            I18N.I18NKeys.NewWindowTitle.BindingLocalizationString(this, x => Title = x);
+            I18NKeys.NewWindowTitle.BindingExpression(this, x => x.Title);
+            I18NKeys.Name.BindingExpression(name, x => x.Text);
         }
 
         protected override void OnClosing(CancelEventArgs e)

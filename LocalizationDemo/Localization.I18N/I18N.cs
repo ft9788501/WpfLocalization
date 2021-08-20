@@ -1,69 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Resources;
 
-namespace LocalizationDemo.Properties
+namespace Localization.I18N
 {
     public static class I18N
     {
-        public enum I18NKeys
+        class BindingExpressionData : I18NWeakEventListenerAbstract
         {
-            [Description("title")] Title,
-            [Description("name")] Name,
-            [Description("12")] Age,
-            [Description("MessageBox")] MessageBox,
-            [Description("Show New Window")] ShowNewWindow,
-            [Description("newWindowTitle")] NewWindowTitle,
-            [Description("Success")] Success,
-            [Description("this is string start")] String1,
-            [Description("this is string end")] String2,
-        }
+            private readonly object sender;
+            private readonly PropertyInfo propertyInfo;
 
-        class BindingData : I18NWeakEventListenerAbstract
-        {
-            private readonly I18NKeys key;
-            private readonly Action<string> actionWithArg;
-            private readonly Action action;
+            public I18NKeys Key { get; set; }
 
-            public BindingData(I18NKeys key, Action<string> actionWithArg)
+            public BindingExpressionData(I18NKeys key, object sender, PropertyInfo propertyInfo)
             {
-                this.key = key;
-                this.actionWithArg = actionWithArg;
-                ReceiveWeakEvent();
+                Key = key;
+                this.sender = sender;
+                this.propertyInfo = propertyInfo;
             }
-            public BindingData(Action action)
+            ~BindingExpressionData()
             {
-                this.action = action;
-                ReceiveWeakEvent();
             }
-            ~BindingData()
+
+            public bool Equals(object sender, PropertyInfo propertyInfo)
             {
+                return this.sender == sender && this.propertyInfo == propertyInfo;
             }
 
             #region I18NWeakEventListenerAbstract
 
             public override void ReceiveWeakEvent()
             {
-                actionWithArg?.Invoke(key.GetLocalizationString());
-                action?.Invoke();
+                propertyInfo?.SetValue(sender, Key.GetLocalizationString());
             }
 
             #endregion
         }
 
-        private const char SPLIT = ':';
-
         public static event EventHandler CultureChanged;
 
+        private const char SPLIT = ':';
         private static Dictionary<I18NKeys, string> i18nMap = new Dictionary<I18NKeys, string>();
-        private static Dictionary<object, List<BindingData>> bindingDataMap = new Dictionary<object, List<BindingData>>();
+        private static readonly Dictionary<int, List<BindingExpressionData>> bindingExpressionMap = new Dictionary<int, List<BindingExpressionData>>();
 
         static I18N()
         {
@@ -83,29 +70,34 @@ namespace LocalizationDemo.Properties
             return i18nMap[i18NKeys];
         }
 
-        public static void BindingLocalizationString(this I18NKeys i18NKeys, object sender, Action<string> action)
+        public static void BindingExpression<T>(this I18NKeys i18NKey, T sender, Expression<Func<T, object>> memberLambda)
         {
-            if (!bindingDataMap.TryGetValue(sender, out List<BindingData> bindingDatas))
+            if (!bindingExpressionMap.TryGetValue(sender.GetHashCode(), out List<BindingExpressionData> bindingExpressionDatas))
             {
-                bindingDatas = new List<BindingData>();
-                bindingDataMap.Add(sender, bindingDatas);
+                bindingExpressionDatas = new List<BindingExpressionData>();
+                bindingExpressionMap.Add(sender.GetHashCode(), bindingExpressionDatas);
             }
-            bindingDatas.Add(new BindingData(i18NKeys, action));
-        }
-
-        public static void BindingLocalizationString(object sender, Action action)
-        {
-            if (!bindingDataMap.TryGetValue(sender, out List<BindingData> bindingDatas))
+            var memberExpression = memberLambda.Body as MemberExpression;
+            var property = memberExpression?.Member as PropertyInfo;
+            if (property != null)
             {
-                bindingDatas = new List<BindingData>();
-                bindingDataMap.Add(sender, bindingDatas);
+                var bindingExpressionData = bindingExpressionDatas.FirstOrDefault(b => b.Equals(sender, property));
+                if (bindingExpressionData == null)
+                {
+                    bindingExpressionData = new BindingExpressionData(i18NKey, sender, property);
+                    bindingExpressionDatas.Add(bindingExpressionData);
+                }
+                if (bindingExpressionData.Key != i18NKey)
+                {
+                    bindingExpressionData.Key = i18NKey;
+                }
+                bindingExpressionData.ReceiveWeakEvent();
             }
-            bindingDatas.Add(new BindingData(action));
         }
 
         public static void RemoveBinding(object sender)
         {
-            bindingDataMap.Remove(sender);
+            bindingExpressionMap.Remove(sender.GetHashCode());
         }
 
         public static bool SaveAsJson(string path)
@@ -135,6 +127,18 @@ namespace LocalizationDemo.Properties
             try
             {
                 var json = File.ReadAllText(path);
+                return LoadFromJsonStr(json);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool LoadFromJsonStr(string json)
+        {
+            try
+            {
                 var jsonStr = JsonSerializer.Deserialize<string[]>(json);
                 Dictionary<I18NKeys, string> i18nMap = new Dictionary<I18NKeys, string>();
                 foreach (var propertyStr in jsonStr)
@@ -151,6 +155,18 @@ namespace LocalizationDemo.Properties
             catch
             {
                 return false;
+            }
+        }
+
+        public static void SetCulture(string culture)
+        {
+            Uri uri = new Uri(@$"pack://application:,,,/Localization.I18N;component/I18NResources/{culture}.json", UriKind.Absolute);
+            StreamResourceInfo info = Application.GetResourceStream(uri);
+            using (info.Stream)
+            {
+                using StreamReader streamReader = new StreamReader(info.Stream);
+                string json = streamReader.ReadToEnd();
+                LoadFromJsonStr(json);
             }
         }
     }

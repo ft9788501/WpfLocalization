@@ -1,4 +1,4 @@
-﻿using LocalizationDemo.Properties;
+﻿using Localization.I18N;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -16,8 +16,8 @@ namespace LocalizationDemo
     {
         public App()
         {
-            I18N.SaveAsJson(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @$"..\..\..\Properties\I18N\en-US.json"));
-            //I18N.SaveAsJson("x");
+            //I18N.SaveAsJson(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @$"..\..\..\Properties\I18N\en-US.json"));
+            I18N.SaveAsJson("x");
         }
     }
 }

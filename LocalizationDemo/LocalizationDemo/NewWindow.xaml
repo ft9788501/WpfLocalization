@@ -4,10 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LocalizationDemo"
-        xmlns:properties="clr-namespace:LocalizationDemo.Properties"
+        xmlns:i18n="clr-namespace:Localization.I18N;assembly=Localization.I18N"
         mc:Ignorable="d"
         Title="NewWindow" Height="450" Width="800">
     <Grid>
-        <TextBlock Text="{properties:I18N Key=Age}" />
+        <TextBlock Text="{i18n:I18N Key=Age}" />
+        <TextBlock x:Name="name" />
     </Grid>
 </Window>

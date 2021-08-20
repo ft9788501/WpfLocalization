@@ -4,15 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LocalizationDemo"
-        xmlns:properties="clr-namespace:LocalizationDemo.Properties"
+        xmlns:i18n="clr-namespace:Localization.I18N;assembly=Localization.I18N"
         mc:Ignorable="d"
-        Title="{properties:I18N Key=Title}" Height="450" Width="800">
+        Title="{i18n:I18N Key=Title}" Height="450" Width="800">
     <Grid>
         <StackPanel Width="200" VerticalAlignment="Top" HorizontalAlignment="Left">
             <StackPanel  Background="Yellow">
                 <TextBlock Text="Xaml"/>
-                <TextBlock Text="{properties:I18N Key=Name}"/>
-                <TextBlock Text="{properties:I18N Key=Age}"/>
+                <TextBlock Text="{i18n:I18N Key=Name}"/>
+                <TextBlock Text="{i18n:I18N Key=Age}"/>
             </StackPanel>
             <StackPanel  Background="LimeGreen">
                 <TextBlock Text="C# Code"/>
@@ -23,14 +23,19 @@
                 <TextBlock Text="String Format"/>
                 <TextBlock x:Name="textblock3"/>
             </StackPanel>
+            <StackPanel  Background="MediumVioletRed">
+                <TextBlock Text="SpeakingIndicator"/>
+                <TextBlock Text="{Binding SpeakingIndicatorSuffix}"/>
+            </StackPanel>
         </StackPanel>
         <StackPanel Width="150" VerticalAlignment="Top" HorizontalAlignment="Right">
             <ComboBox Width="150" Height="25" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged">
                 <ComboBoxItem Content="en-US"/>
                 <ComboBoxItem Content="zh-CN"/>
             </ComboBox>
-            <Button Width="150" Height="25" Content="{properties:I18N Key=ShowNewWindow}" Click="Button_Click"/>
-            <Button Width="150" Height="25" Content="{properties:I18N Key=MessageBox}" Click="Button_Click_1"/>
+            <Button Width="150" Height="25" Content="{i18n:I18N Key=ShowNewWindow}" Click="Button_Click"/>
+            <Button Width="150" Height="25" Content="{i18n:I18N Key=MessageBox}" Click="Button_Click_1"/>
+            <Button Width="150" Height="25" Content="SpeakingIndicatorChanged" Click="Button_Click_2"/>
         </StackPanel>
     </Grid>
 </Window>

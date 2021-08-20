@@ -7,12 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="Properties\I18N\en-US.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Properties\I18N\zh-CN.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\Localization.I18N\Localization.I18N.csproj" />
   </ItemGroup>
 
 </Project>
