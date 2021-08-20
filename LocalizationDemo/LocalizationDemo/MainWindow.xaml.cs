@@ -65,7 +65,11 @@ namespace LocalizationDemo
             DataContext = viewModel;
             I18NKeys.Name.BindingExpression(textblock1, x => x.Text);
             I18NKeys.Age.BindingExpression(textblock2, x => x.Text);
-            //I18N.BindingLocalizationString(this, () => textblock3.Text = $"{I18NKeys.String1.GetLocalizationString()}+{I18NKeys.String2.GetLocalizationString()}");
+            textblock3.Text = $"{I18NKeys.String1.GetLocalizationString()}+{I18NKeys.String2.GetLocalizationString()}";
+            I18N.CultureChanged += (s, e) =>
+            {
+                textblock3.Text = $"{I18NKeys.String1.GetLocalizationString()}+{I18NKeys.String2.GetLocalizationString()}";
+            };
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -92,7 +96,6 @@ namespace LocalizationDemo
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
-            I18N.RemoveBinding(this);
         }
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {

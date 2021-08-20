@@ -26,11 +26,6 @@ namespace LocalizationDemo
             I18NKeys.Name.BindingExpression(name, x => x.Text);
         }
 
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            base.OnClosing(e);
-            I18N.RemoveBinding(this);
-        }
         ~NewWindow()
         {
         }

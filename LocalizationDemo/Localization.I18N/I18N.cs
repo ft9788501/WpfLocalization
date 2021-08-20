@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Resources;
@@ -50,7 +51,7 @@ namespace Localization.I18N
 
         private const char SPLIT = ':';
         private static Dictionary<I18NKeys, string> i18nMap = new Dictionary<I18NKeys, string>();
-        private static readonly Dictionary<int, List<BindingExpressionData>> bindingExpressionMap = new Dictionary<int, List<BindingExpressionData>>();
+        private static readonly ConditionalWeakTable<object, List<BindingExpressionData>> bindingExpressionMap = new ConditionalWeakTable<object, List<BindingExpressionData>>();
 
         static I18N()
         {
@@ -72,10 +73,10 @@ namespace Localization.I18N
 
         public static void BindingExpression<T>(this I18NKeys i18NKey, T sender, Expression<Func<T, object>> memberLambda)
         {
-            if (!bindingExpressionMap.TryGetValue(sender.GetHashCode(), out List<BindingExpressionData> bindingExpressionDatas))
+            if (!bindingExpressionMap.TryGetValue(sender, out List<BindingExpressionData> bindingExpressionDatas))
             {
                 bindingExpressionDatas = new List<BindingExpressionData>();
-                bindingExpressionMap.Add(sender.GetHashCode(), bindingExpressionDatas);
+                bindingExpressionMap.Add(sender, bindingExpressionDatas);
             }
             var memberExpression = memberLambda.Body as MemberExpression;
             var property = memberExpression?.Member as PropertyInfo;
@@ -93,11 +94,6 @@ namespace Localization.I18N
                 }
                 bindingExpressionData.ReceiveWeakEvent();
             }
-        }
-
-        public static void RemoveBinding(object sender)
-        {
-            bindingExpressionMap.Remove(sender.GetHashCode());
         }
 
         public static bool SaveAsJson(string path)
