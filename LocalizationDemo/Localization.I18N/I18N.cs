@@ -41,7 +41,17 @@ namespace Localization.I18N
 
             public override void ReceiveWeakEvent()
             {
-                propertyInfo?.SetValue(sender, Key.GetLocalizationString());
+                if (sender is DependencyObject dependencyObject)
+                {
+                    dependencyObject.Dispatcher.Invoke(() =>
+                    {
+                        propertyInfo?.SetValue(sender, Key.GetLocalizationString());
+                    });
+                }
+                else
+                {
+                    propertyInfo?.SetValue(sender, Key.GetLocalizationString());
+                }
             }
 
             #endregion

@@ -18,6 +18,9 @@ namespace Localization.I18N
             {
                 this.key = key;
             }
+            ~BindingData()
+            {
+            }
 
             public string Value
             {
@@ -50,7 +53,8 @@ namespace Localization.I18N
         {
             var binding = new Binding(nameof(BindingData.Value))
             {
-                Source = new BindingData(Key)
+                Source = new BindingData(Key),
+                Mode = BindingMode.OneWay
             };
             return binding.ProvideValue(serviceProvider);
         }
