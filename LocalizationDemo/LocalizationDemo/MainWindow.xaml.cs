@@ -34,12 +34,23 @@ namespace LocalizationDemo
 
             private bool flag1 = false;
             private string speakingIndicatorSuffix = I18NKeys.SpeakingIndicatorSpeaking.GetLocalizationString();
+            private bool enablePseudo = false;
             public string SpeakingIndicatorSuffix
             {
                 get => speakingIndicatorSuffix;
                 set
                 {
                     speakingIndicatorSuffix = value;
+                    OnPropertyChanged();
+                }
+            }
+            public bool EnablePseudo
+            {
+                get => enablePseudo;
+                set
+                {
+                    enablePseudo = value;
+                    I18NManager.EnablePseudo = value;
                     OnPropertyChanged();
                 }
             }
@@ -63,19 +74,21 @@ namespace LocalizationDemo
         {
             InitializeComponent();
             DataContext = viewModel;
+            I18NKeys.Title.ToString();
             I18NKeys.Name.BindingExpression(textblock1, x => x.Text);
             I18NKeys.Age.BindingExpression(textblock2, x => x.Text);
             textblock3.Text = $"{I18NKeys.String1.GetLocalizationString()}+{I18NKeys.String2.GetLocalizationString()}";
-            I18N.CultureChanged += (s, e) =>
+            I18NManager.CultureChanged += (s, e) =>
             {
                 textblock3.Text = $"{I18NKeys.String1.GetLocalizationString()}+{I18NKeys.String2.GetLocalizationString()}";
             };
+            I18NKeys.FormatString.BindingExpression(textblock4, x => x.Text, "p1", "p2");
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var culture = ((ComboBoxItem)((ComboBox)sender).SelectedItem).Content.ToString();
-            I18N.SetCulture(culture);
+            I18NManager.SetCulture(culture);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -83,8 +96,7 @@ namespace LocalizationDemo
             NewWindow window = new NewWindow()
             {
                 Width = 550,
-                Height = 100,
-                Title = I18NKeys.NewWindowTitle.GetLocalizationString()
+                Height = 100
             };
             window.Show();
         }

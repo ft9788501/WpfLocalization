@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -17,7 +19,24 @@ namespace LocalizationDemo
         public App()
         {
             //I18N.SaveAsJson(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @$"..\..\..\Properties\I18N\en-US.json"));
-            I18N.SaveAsJson("x");
+            I18NManager.SaveAsJson("x");
+            //bool f = true;
+            //Task.Run(async ()=> 
+            //{
+            //    while (true)
+            //    {
+            //        await Task.Delay(3000);
+            //        if (f)
+            //        {
+            //            I18N.SetCulture("en-US");
+            //        }
+            //        else
+            //        {
+            //            I18N.SetCulture("zh-CN");
+            //        }
+            //        f = !f;
+            //    }
+            //});
         }
     }
 }

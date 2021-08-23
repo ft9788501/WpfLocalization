@@ -22,7 +22,6 @@ namespace LocalizationDemo
         public NewWindow()
         {
             InitializeComponent();
-            I18NKeys.NewWindowTitle.BindingExpression(this, x => x.Title);
             I18NKeys.Name.BindingExpression(name, x => x.Text);
         }
 

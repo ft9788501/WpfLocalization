@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -12,12 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="I18NResources\en-US.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="I18NResources\zh-CN.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="I18NResources\en-US.json" />
+    <Resource Include="I18NResources\zh-CN.json" />
   </ItemGroup>
 
 </Project>

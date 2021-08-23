@@ -9,5 +9,6 @@
   "String1:this is string start",
   "String2:this is string end",
   "SpeakingIndicatorSpeaking:is Speaking",
-  "SpeakingIndicatorReconnecting:is Reconnecting"
+  "SpeakingIndicatorReconnecting:is Reconnecting",
+  "FormatString:This is a {old device} and will switch to {new device} ."
 ]

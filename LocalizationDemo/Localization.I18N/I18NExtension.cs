@@ -10,7 +10,7 @@ namespace Localization.I18N
 {
     public class I18NExtension : MarkupExtension
     {
-        class BindingData : I18NWeakEventListenerAbstract, INotifyPropertyChanged
+        class BindingData : WeakEventListenerAbstract, INotifyPropertyChanged
         {
             private readonly I18NKeys key;
 
@@ -26,7 +26,7 @@ namespace Localization.I18N
             {
                 get
                 {
-                    return I18N.GetLocalizationString(key);
+                    return I18NManager.GetLocalizationString(key);
                 }
             }
 

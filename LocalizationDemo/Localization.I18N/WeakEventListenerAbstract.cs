@@ -5,19 +5,19 @@ using System.Windows;
 
 namespace Localization.I18N
 {
-    abstract class I18NWeakEventListenerAbstract : IWeakEventListener
+    abstract class WeakEventListenerAbstract : IWeakEventListener
     {
-        class I18NEventManager : WeakEventManager
+        class CultureChangedEventManager : WeakEventManager
         {
-            private static I18NEventManager CurrentManager
+            private static CultureChangedEventManager CurrentManager
             {
                 get
                 {
-                    I18NEventManager manager = (I18NEventManager)GetCurrentManager(typeof(I18NEventManager));
+                    CultureChangedEventManager manager = (CultureChangedEventManager)GetCurrentManager(typeof(CultureChangedEventManager));
                     if (manager == null)
                     {
-                        manager = new I18NEventManager();
-                        SetCurrentManager(typeof(I18NEventManager), manager);
+                        manager = new CultureChangedEventManager();
+                        SetCurrentManager(typeof(CultureChangedEventManager), manager);
                     }
                     return manager;
                 }
@@ -35,12 +35,12 @@ namespace Localization.I18N
 
             protected override void StartListening(object source)
             {
-                I18N.CultureChanged += OnCultureChanged;
+                I18NManager.CultureChanged += OnCultureChanged;
             }
 
             protected override void StopListening(object source)
             {
-                I18N.CultureChanged -= OnCultureChanged;
+                I18NManager.CultureChanged -= OnCultureChanged;
             }
 
             private void OnCultureChanged(object sender, EventArgs e)
@@ -49,20 +49,20 @@ namespace Localization.I18N
             }
         }
 
-        public I18NWeakEventListenerAbstract()
+        public WeakEventListenerAbstract()
         {
-            I18NEventManager.AddListener(this);
+            CultureChangedEventManager.AddListener(this);
         }
-        ~I18NWeakEventListenerAbstract()
+        ~WeakEventListenerAbstract()
         {
-            I18NEventManager.RemoveListener(this);
+            CultureChangedEventManager.RemoveListener(this);
         }
 
         #region IWeakEventListener
 
         public bool ReceiveWeakEvent(Type managerType, object sender, EventArgs e)
         {
-            if (managerType == typeof(I18NEventManager))
+            if (managerType == typeof(CultureChangedEventManager))
             {
                 ReceiveWeakEvent();
                 return true;

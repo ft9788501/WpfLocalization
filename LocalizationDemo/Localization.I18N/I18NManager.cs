@@ -7,26 +7,30 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Resources;
 
 namespace Localization.I18N
 {
-    public static class I18N
+    public static class I18NManager
     {
-        class BindingExpressionData : I18NWeakEventListenerAbstract
+        class BindingExpressionData : WeakEventListenerAbstract
         {
             private readonly object sender;
             private readonly PropertyInfo propertyInfo;
+            private readonly string[] formatParams;
 
             public I18NKeys Key { get; set; }
 
-            public BindingExpressionData(I18NKeys key, object sender, PropertyInfo propertyInfo)
+            public BindingExpressionData(I18NKeys key, object sender, PropertyInfo propertyInfo, params string[] formatParams)
             {
                 Key = key;
                 this.sender = sender;
                 this.propertyInfo = propertyInfo;
+                this.formatParams = formatParams;
             }
             ~BindingExpressionData()
             {
@@ -45,12 +49,12 @@ namespace Localization.I18N
                 {
                     dependencyObject.Dispatcher.Invoke(() =>
                     {
-                        propertyInfo?.SetValue(sender, Key.GetLocalizationString());
+                        propertyInfo?.SetValue(sender, Key.GetLocalizationString(formatParams));
                     });
                 }
                 else
                 {
-                    propertyInfo?.SetValue(sender, Key.GetLocalizationString());
+                    propertyInfo?.SetValue(sender, Key.GetLocalizationString(formatParams));
                 }
             }
 
@@ -60,10 +64,33 @@ namespace Localization.I18N
         public static event EventHandler CultureChanged;
 
         private const char SPLIT = ':';
+        private static bool enablePseudo = false;
         private static Dictionary<I18NKeys, string> i18nMap = new Dictionary<I18NKeys, string>();
         private static readonly ConditionalWeakTable<object, List<BindingExpressionData>> bindingExpressionMap = new ConditionalWeakTable<object, List<BindingExpressionData>>();
 
-        static I18N()
+        public static bool EnablePseudo
+        {
+            get => enablePseudo;
+            set
+            {
+                enablePseudo = value;
+                OnCultureChanged();
+            }
+        }
+
+        private static IEnumerable<ILocalizationFormatter> Formatters
+        {
+            get
+            {
+                yield return ILocalizationFormatter.ArgsString;
+                if (EnablePseudo)
+                {
+                    yield return ILocalizationFormatter.Pseudo;
+                }
+            }
+        }
+
+        static I18NManager()
         {
             var properties = Enum.GetValues(typeof(I18NKeys))
                  .Cast<object>()
@@ -73,15 +100,24 @@ namespace Localization.I18N
             {
                 i18nMap.Add(property.Key, property.Value);
             }
-            I18N.i18nMap = i18nMap;
+            I18NManager.i18nMap = i18nMap;
         }
 
-        public static string GetLocalizationString(this I18NKeys i18NKeys)
+        public static string GetLocalizationString(this I18NKeys i18NKeys, params string[] formatParams)
         {
-            return i18nMap[i18NKeys];
+            return Format(i18nMap[i18NKeys], formatParams);
         }
 
-        public static void BindingExpression<T>(this I18NKeys i18NKey, T sender, Expression<Func<T, object>> memberLambda)
+        private static string Format(string originString, params string[] formatParams)
+        {
+            foreach (var formatter in Formatters)
+            {
+                originString = formatter.Format(originString, formatParams);
+            }
+            return originString;
+        }
+
+        public static void BindingExpression<T>(this I18NKeys i18NKey, T sender, Expression<Func<T, object>> memberLambda, params string[] formatParams)
         {
             if (!bindingExpressionMap.TryGetValue(sender, out List<BindingExpressionData> bindingExpressionDatas))
             {
@@ -95,7 +131,7 @@ namespace Localization.I18N
                 var bindingExpressionData = bindingExpressionDatas.FirstOrDefault(b => b.Equals(sender, property));
                 if (bindingExpressionData == null)
                 {
-                    bindingExpressionData = new BindingExpressionData(i18NKey, sender, property);
+                    bindingExpressionData = new BindingExpressionData(i18NKey, sender, property, formatParams);
                     bindingExpressionDatas.Add(bindingExpressionData);
                 }
                 if (bindingExpressionData.Key != i18NKey)
@@ -154,8 +190,8 @@ namespace Localization.I18N
                     var propertyValue = stringParts[1];
                     i18nMap.Add(Enum.Parse<I18NKeys>(propertyName), propertyValue);
                 }
-                I18N.i18nMap = i18nMap;
-                CultureChanged?.Invoke(null, EventArgs.Empty);
+                I18NManager.i18nMap = i18nMap;
+                OnCultureChanged();
                 return true;
             }
             catch
@@ -174,6 +210,11 @@ namespace Localization.I18N
                 string json = streamReader.ReadToEnd();
                 LoadFromJsonStr(json);
             }
+        }
+
+        private static void OnCultureChanged()
+        {
+            CultureChanged?.Invoke(null, EventArgs.Empty);
         }
     }
 }

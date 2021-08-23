@@ -5,14 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LocalizationDemo"
         xmlns:i18n="clr-namespace:Localization.I18N;assembly=Localization.I18N"
-        mc:Ignorable="d"
-        Title="{i18n:I18N Key=Title}" Height="450" Width="800">
+        mc:Ignorable="d" Height="450" Width="800" Title="{i18n:I18N Key=Title}">
     <Grid>
         <StackPanel Width="200" VerticalAlignment="Top" HorizontalAlignment="Left">
             <StackPanel  Background="Yellow">
                 <TextBlock Text="Xaml"/>
-                <TextBlock Text="{i18n:I18N Key=Name}"/>
-                <TextBlock Text="{i18n:I18N Key=Age}"/>
             </StackPanel>
             <StackPanel  Background="LimeGreen">
                 <TextBlock Text="C# Code"/>
@@ -22,9 +19,14 @@
             <StackPanel  Background="LightBlue">
                 <TextBlock Text="String Format"/>
                 <TextBlock x:Name="textblock3"/>
+                <TextBlock x:Name="textblock4"/>
             </StackPanel>
             <StackPanel  Background="MediumVioletRed">
                 <TextBlock Text="SpeakingIndicator"/>
+                <TextBlock Text="{Binding SpeakingIndicatorSuffix}"/>
+            </StackPanel>
+            <StackPanel  Background="LightCoral">
+                <TextBlock Text="DataTrigger"/>
                 <TextBlock Text="{Binding SpeakingIndicatorSuffix}"/>
             </StackPanel>
         </StackPanel>
@@ -33,9 +35,10 @@
                 <ComboBoxItem Content="en-US"/>
                 <ComboBoxItem Content="zh-CN"/>
             </ComboBox>
-            <Button Width="150" Height="25" Content="{i18n:I18N Key=ShowNewWindow}" Click="Button_Click"/>
-            <Button Width="150" Height="25" Content="{i18n:I18N Key=MessageBox}" Click="Button_Click_1"/>
+            <Button Width="150" Height="25" Content="ShowNewWindow" Click="Button_Click"/>
+            <Button Width="150" Height="25" Content="MessageBox" Click="Button_Click_1"/>
             <Button Width="150" Height="25" Content="SpeakingIndicatorChanged" Click="Button_Click_2"/>
+            <CheckBox Width="150" Height="25" Content="Pseudo" IsChecked="{Binding EnablePseudo}"/>
         </StackPanel>
     </Grid>
 </Window>
