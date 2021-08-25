@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,9 +20,32 @@ namespace LocalizationDemo
     /// </summary>
     public partial class NewWindow : Window
     {
+        public class ViewModel : INotifyPropertyChanged
+        {
+            public event PropertyChangedEventHandler PropertyChanged;
+
+            protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+            private string versionInfo = "1.0.0";
+            public string VersionInfo
+            {
+                get => versionInfo;
+                set
+                {
+                    versionInfo = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        private ViewModel viewModel = new ViewModel();
+
         public NewWindow()
         {
             InitializeComponent();
+            DataContext = viewModel;
             I18NKeys.Name.BindingExpression(name, x => x.Text);
         }
 

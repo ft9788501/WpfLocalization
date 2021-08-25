@@ -1,14 +1,54 @@
 [
-  "Title:title",
-  "Name:name",
-  "Age:12",
-  "MessageBox:MessageBox",
-  "ShowNewWindow:Show New Window",
-  "NewWindowTitle:newWindowTitle",
-  "Success:Success",
-  "String1:this is string start",
-  "String2:this is string end",
-  "SpeakingIndicatorSpeaking:is Speaking",
-  "SpeakingIndicatorReconnecting:is Reconnecting",
-  "FormatString:This is a {old device} and will switch to {new device} ."
+  {
+    "Key": "Title",
+    "Value": "title"
+  },
+  {
+    "Key": "Name",
+    "Value": "name"
+  },
+  {
+    "Key": "Age",
+    "Value": "12"
+  },
+  {
+    "Key": "MessageBox",
+    "Value": "MessageBox"
+  },
+  {
+    "Key": "ShowNewWindow",
+    "Value": "Show New Window"
+  },
+  {
+    "Key": "NewWindowTitle",
+    "Value": "newWindowTitle"
+  },
+  {
+    "Key": "Success",
+    "Value": "Success"
+  },
+  {
+    "Key": "String1",
+    "Value": "this is string start"
+  },
+  {
+    "Key": "String2",
+    "Value": "this is string end"
+  },
+  {
+    "Key": "SpeakingIndicatorSpeaking",
+    "Value": "is Speaking"
+  },
+  {
+    "Key": "SpeakingIndicatorReconnecting",
+    "Value": "is Reconnecting"
+  },
+  {
+    "Key": "FormatString",
+    "Value": "This is a {old device} and will switch to {new device} ."
+  },
+  {
+    "Key": "Version",
+    "Value": "Version ({version number})."
+  }
 ]

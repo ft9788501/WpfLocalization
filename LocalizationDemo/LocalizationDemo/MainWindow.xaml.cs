@@ -32,6 +32,8 @@ namespace LocalizationDemo
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
 
+            private string versionInfo = "1.0.0";
+            private string versionInfo1 = "2.0.0";
             private bool flag1 = false;
             private string speakingIndicatorSuffix = I18NKeys.SpeakingIndicatorSpeaking.GetLocalizationString();
             private bool enablePseudo = false;
@@ -41,6 +43,24 @@ namespace LocalizationDemo
                 set
                 {
                     speakingIndicatorSuffix = value;
+                    OnPropertyChanged();
+                }
+            }
+            public string VersionInfo
+            {
+                get => versionInfo;
+                set
+                {
+                    versionInfo = value;
+                    OnPropertyChanged();
+                }
+            }
+            public string VersionInfo1
+            {
+                get => versionInfo1;
+                set
+                {
+                    versionInfo1 = value;
                     OnPropertyChanged();
                 }
             }
@@ -57,6 +77,8 @@ namespace LocalizationDemo
 
             public void SpeakingIndicatorChanged()
             {
+                VersionInfo += "a";
+                return;
                 if (flag1)
                 {
                     I18NKeys.SpeakingIndicatorSpeaking.BindingExpression(this, x => SpeakingIndicatorSuffix);

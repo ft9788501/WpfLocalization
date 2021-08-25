@@ -4,6 +4,7 @@
     <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +15,25 @@
   <ItemGroup>
     <Resource Include="I18NResources\en-US.json" />
     <Resource Include="I18NResources\zh-CN.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="I18NKeys.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>I18NKeys.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="I18NKeys.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>I18NKeys.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

@@ -26,8 +26,9 @@
                 <TextBlock Text="{Binding SpeakingIndicatorSuffix}"/>
             </StackPanel>
             <StackPanel  Background="LightCoral">
-                <TextBlock Text="DataTrigger"/>
-                <TextBlock Text="{Binding SpeakingIndicatorSuffix}"/>
+                <TextBlock Text="Xaml Format"/>
+                <TextBlock Text="{Binding VersionInfo}"/>
+                <TextBlock Text="{i18n:I18N {Binding VersionInfo},Key=Version}"/>
             </StackPanel>
         </StackPanel>
         <StackPanel Width="150" VerticalAlignment="Top" HorizontalAlignment="Right">

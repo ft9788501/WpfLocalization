@@ -1,14 +1,54 @@
 ﻿[
-  "Title:标题",
-  "Name:名字",
-  "Age:十二",
-  "MessageBox:消息盒子",
-  "ShowNewWindow:显示新窗体",
-  "NewWindowTitle:新窗体标题",
-  "Success:成功",
-  "String1:这是字符的开始",
-  "String2:这是字符的结束",
-  "SpeakingIndicatorSpeaking:正在说话",
-  "SpeakingIndicatorReconnecting:重新连接",
-  "FormatString:这是一个{old device}而他将要切换到{new device}。"
+  {
+    "Key": "Title",
+    "Value": "标题"
+  },
+  {
+    "Key": "Name",
+    "Value": "名字"
+  },
+  {
+    "Key": "Age",
+    "Value": "十二"
+  },
+  {
+    "Key": "MessageBox",
+    "Value": "消息盒子"
+  },
+  {
+    "Key": "ShowNewWindow",
+    "Value": "显示新窗体"
+  },
+  {
+    "Key": "NewWindowTitle",
+    "Value": "新窗体标题"
+  },
+  {
+    "Key": "Success",
+    "Value": "成功"
+  },
+  {
+    "Key": "String1",
+    "Value": "这是字符的开始"
+  },
+  {
+    "Key": "String2",
+    "Value": "这是字符的结束"
+  },
+  {
+    "Key": "SpeakingIndicatorSpeaking",
+    "Value": "正在说话"
+  },
+  {
+    "Key": "SpeakingIndicatorReconnecting",
+    "Value": "重新连接"
+  },
+  {
+    "Key": "FormatString",
+    "Value": "这是一个{old device}而他将要切换到{new device}。"
+  },
+  {
+    "Key": "Version",
+    "Value": "版本号 ({version number})。"
+  }
 ]

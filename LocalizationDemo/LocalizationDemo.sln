@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31105.61
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LocalizationDemo", "LocalizationDemo\LocalizationDemo.csproj", "{8F8143BE-2F30-4385-ACA2-E95BC50D5370}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Localization.I18N", "Localization.I18N\Localization.I18N.csproj", "{6ABCB3E6-0A80-418A-9D4E-192E4E8B95EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Localization.I18N", "Localization.I18N\Localization.I18N.csproj", "{6ABCB3E6-0A80-418A-9D4E-192E4E8B95EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

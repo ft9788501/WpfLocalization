@@ -1,0 +1,34 @@
+﻿//TT generate can not run at build time, this is a know issue:https://github.com/mono/t4/issues/47
+//Pre-build event:"$(DevEnvDir)TextTransform.exe" "$(ProjectDir)TextTemplate1.tt" 
+// This is an auto-generated file.
+<#@ template language="C#" hostSpecific="true"#>
+<#@ output extension="cs" #>
+<#@ assembly name="netstandard" #>
+<#@ assembly name="System.Memory" #>
+<#@ assembly name="System.Runtime" #>
+<#@ assembly name="System.Text.Json" #>
+<#@ assembly name="EnvDte" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System" #>
+using System.ComponentModel;
+
+namespace Localization.I18N
+{
+    // This is an auto-generated file. Do not modify this file manually, if you need to modify the contents, Please motify the I18NKeys.tt file.
+    public enum I18NKeys
+    {
+<#
+string json = File.ReadAllText(this.Host.ResolvePath("I18NResources/en-US.json"));
+var jsonStr = System.Text.Json.JsonSerializer.Deserialize<List<Dictionary<string, string>>>(json);
+foreach (var item in jsonStr)
+{
+var key = item["Key"];
+var value = item["Value"];
+WriteLine($"        /// <summary>{value}</summary>");
+WriteLine($"        {key},");
+}               
+#>
+    }
+}

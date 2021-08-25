@@ -1,35 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
+﻿//TT generate can not run at build time, this is a know issue:https://github.com/mono/t4/issues/47
+//Pre-build event:"$(DevEnvDir)TextTransform.exe" "$(ProjectDir)TextTemplate1.tt" 
+// This is an auto-generated file.
 using System.ComponentModel;
-using System.Text;
 
 namespace Localization.I18N
 {
+    // This is an auto-generated file. Do not modify this file manually, if you need to modify the contents, Please motify the I18NKeys.tt file.
     public enum I18NKeys
     {
         /// <summary>title</summary>
-        [Description("title")] Title,
+        Title,
         /// <summary>name</summary>
-        [Description("name")] Name,
+        Name,
         /// <summary>12</summary>
-        [Description("12")] Age,
+        Age,
         /// <summary>MessageBox</summary>
-        [Description("MessageBox")] MessageBox,
+        MessageBox,
         /// <summary>Show New Window</summary>
-        [Description("Show New Window")] ShowNewWindow,
+        ShowNewWindow,
         /// <summary>newWindowTitle</summary>
-        [Description("newWindowTitle")] NewWindowTitle,
+        NewWindowTitle,
         /// <summary>Success</summary>
-        [Description("Success")] Success,
+        Success,
         /// <summary>this is string start</summary>
-        [Description("this is string start")] String1,
+        String1,
         /// <summary>this is string end</summary>
-        [Description("this is string end")] String2,
+        String2,
         /// <summary>is Speaking</summary>
-        [Description("is Speaking")] SpeakingIndicatorSpeaking,
+        SpeakingIndicatorSpeaking,
         /// <summary>is Reconnecting</summary>
-        [Description("is Reconnecting")] SpeakingIndicatorReconnecting,
-        /// <summary>is Reconnecting</summary>
-        [Description("This is a {old device} and will switch to {new device} .")] FormatString,
+        SpeakingIndicatorReconnecting,
+        /// <summary>This is a {old device} and will switch to {new device} .</summary>
+        FormatString,
+        /// <summary>Version ({version number}).</summary>
+        Version,
     }
 }

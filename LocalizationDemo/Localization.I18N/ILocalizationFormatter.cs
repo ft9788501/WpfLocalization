@@ -8,8 +8,8 @@ namespace Localization.I18N
 {
     internal interface ILocalizationFormatter
     {
-        public static ILocalizationFormatter ArgsString { get; set; } = new ArgsStringFormatter();
-        public static ILocalizationFormatter Pseudo { get; set; } = new PseudoFormatter();
+        public static ILocalizationFormatter ArgsStringFormatter { get; set; } = new ArgsStringFormatter();
+        public static ILocalizationFormatter PseudoFormatter { get; set; } = new PseudoFormatter();
 
         string Format(string originString, params string[] formatParams);
     }
@@ -115,7 +115,7 @@ namespace Localization.I18N
         {
             var pseudoString = string.Join("", originString.Select(c => pseudoCharMap.ContainsKey(c) ? pseudoCharMap[c] : c));
             pseudoString = string.Join("", pseudoString.Select((c, i) => (i % 3 == 0) ? $"{c}_" : c.ToString()));
-            return pseudoString;
+            return $"[{pseudoString}]";
         }
     }
 }
