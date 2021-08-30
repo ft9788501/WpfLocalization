@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Windows;
 
 namespace Localization.I18N
 {
-    abstract class WeakEventListenerAbstract : IWeakEventListener
+    /// <summary>
+    /// https://docs.microsoft.com/en-us/dotnet/desktop/wpf/advanced/weak-event-patterns?view=netframeworkdesktop-4.8
+    /// </summary>
+    abstract class CultureChangedWeakEventListenerAbstract : IWeakEventListener
     {
         class CultureChangedEventManager : WeakEventManager
         {
@@ -43,17 +47,17 @@ namespace Localization.I18N
                 I18NManager.CultureChanged -= OnCultureChanged;
             }
 
-            private void OnCultureChanged(object sender, EventArgs e)
+            private void OnCultureChanged(object sender, CultureInfo e)
             {
-                DeliverEvent(null, e);
+                DeliverEvent(null, EventArgs.Empty);
             }
         }
 
-        public WeakEventListenerAbstract()
+        public CultureChangedWeakEventListenerAbstract()
         {
             CultureChangedEventManager.AddListener(this);
         }
-        ~WeakEventListenerAbstract()
+        ~CultureChangedWeakEventListenerAbstract()
         {
             CultureChangedEventManager.RemoveListener(this);
         }

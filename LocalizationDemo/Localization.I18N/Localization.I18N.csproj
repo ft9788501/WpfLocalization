@@ -5,16 +5,19 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="I18NResources\en-US.json" />
+    <None Remove="I18NResources\non-localized.json" />
     <None Remove="I18NResources\zh-CN.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="I18NResources\en-US.json" />
-    <Resource Include="I18NResources\zh-CN.json" />
+    <EmbeddedResource Include="I18NResources\en-US.json" />
+    <EmbeddedResource Include="I18NResources\non-localized.json" />
+    <EmbeddedResource Include="I18NResources\zh-CN.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,5 +38,9 @@
       <DependentUpon>I18NKeys.tt</DependentUpon>
     </Compile>
   </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="&quot;$(DevEnvDir)TextTransform.exe&quot; &quot;$(ProjectDir)I18NKeys.tt&quot;" />
+  </Target>
 
 </Project>

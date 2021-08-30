@@ -1,26 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
-using System.Xaml;
 
 namespace Localization.I18N
 {
-    public class I18NExtension : MarkupExtension
+    public class I18NKeyBindingExtension : MarkupExtension
     {
         abstract class BindingArgument
         {
-            public abstract object Value { get; }
-            ~BindingArgument()
-            {
-
-            }
             public class ValueArgument : BindingArgument
             {
                 public override object Value { get; }
@@ -30,9 +22,10 @@ namespace Localization.I18N
                     Value = value;
                 }
             }
+
             public class MarkupArgument : BindingArgument
             {
-                private readonly MarkupReader markupReader;
+                private MarkupReader markupReader;
 
                 public override object Value => markupReader.Value;
 
@@ -41,8 +34,15 @@ namespace Localization.I18N
                     markupReader = new MarkupReader(dependencyObject, markup);
                 }
             }
+
+            public abstract object Value { get; }
+
+            ~BindingArgument()
+            {
+
+            }
         }
-        class BindingData : WeakEventListenerAbstract, INotifyPropertyChanged
+        class BindingData : CultureChangedWeakEventListenerAbstract, INotifyPropertyChanged
         {
             private readonly I18NKeys key;
             private IEnumerable<BindingArgument> bindingArgs;
@@ -71,7 +71,7 @@ namespace Localization.I18N
             {
                 get
                 {
-                    var value = I18NManager.GetLocalizationString(key, bindingArgs.Select(b => (b.Value ?? string.Empty).ToString()).ToArray());
+                    var value = key.GetLocalizationString(bindingArgs.Select(b => (b.Value ?? string.Empty).ToString()).ToArray());
                     return value;
                 }
             }
@@ -94,17 +94,17 @@ namespace Localization.I18N
 
         private readonly object[] args;
 
-        public I18NExtension() : this(new object[0]) { }
-        public I18NExtension(object arg) : this(new object[] { arg }) { }
-        public I18NExtension(object arg0, object arg1) : this(new object[] { arg0, arg1 }) { }
-        public I18NExtension(object arg0, object arg1, object arg2) : this(new object[] { arg0, arg1, arg2 }) { }
-        public I18NExtension(object arg0, object arg1, object arg2, object arg3) : this(new object[] { arg0, arg1, arg2, arg3 }) { }
-        public I18NExtension(object arg0, object arg1, object arg2, object arg3, object arg4) : this(new object[] { arg0, arg1, arg2, arg3, arg4 }) { }
-        private I18NExtension(object[] args)
+        public I18NKeyBindingExtension() : this(new object[0]) { }
+        public I18NKeyBindingExtension(object arg) : this(new object[] { arg }) { }
+        public I18NKeyBindingExtension(object arg0, object arg1) : this(new object[] { arg0, arg1 }) { }
+        public I18NKeyBindingExtension(object arg0, object arg1, object arg2) : this(new object[] { arg0, arg1, arg2 }) { }
+        public I18NKeyBindingExtension(object arg0, object arg1, object arg2, object arg3) : this(new object[] { arg0, arg1, arg2, arg3 }) { }
+        public I18NKeyBindingExtension(object arg0, object arg1, object arg2, object arg3, object arg4) : this(new object[] { arg0, arg1, arg2, arg3, arg4 }) { }
+        private I18NKeyBindingExtension(object[] args)
         {
             this.args = args;
         }
-        ~I18NExtension()
+        ~I18NKeyBindingExtension()
         {
         }
 

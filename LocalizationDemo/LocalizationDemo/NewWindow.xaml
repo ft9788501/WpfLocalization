@@ -6,12 +6,12 @@
         xmlns:local="clr-namespace:LocalizationDemo"
         xmlns:i18n="clr-namespace:Localization.I18N;assembly=Localization.I18N"
         mc:Ignorable="d"
-        Title="{i18n:I18N Key=NewWindowTitle}" Height="450" Width="800">
+        Title="{i18n:I18NKeyBinding Key=NewWindowTitle}" Height="450" Width="800">
     <Grid>
         <StackPanel>
             <TextBlock x:Name="name" />
             <TextBlock Text="{Binding VersionInfo}"/>
-            <TextBlock Text="{i18n:I18N {Binding VersionInfo},Key=Version}"/>
+            <TextBlock Text="{i18n:I18NKeyBinding {Binding VersionInfo},Key=Version}"/>
         </StackPanel>
     </Grid>
 </Window>

@@ -1,34 +1,74 @@
-﻿//TT generate can not run at build time, this is a know issue:https://github.com/mono/t4/issues/47
-//Pre-build event:"$(DevEnvDir)TextTransform.exe" "$(ProjectDir)TextTemplate1.tt" 
-// This is an auto-generated file.
+﻿<# //TT generate can not run at build time, this is a know issue:https://github.com/mono/t4/issues/47 #>
+<# //Pre-build event:"$(DevEnvDir)TextTransform.exe" "$(ProjectDir)I18NKeys.tt" #>
 <#@ template language="C#" hostSpecific="true"#>
-<#@ output extension="cs" #>
-<#@ assembly name="netstandard" #>
-<#@ assembly name="System.Memory" #>
-<#@ assembly name="System.Runtime" #>
-<#@ assembly name="System.Text.Json" #>
+<#@ output extension=".cs"#>
 <#@ assembly name="EnvDte" #>
-<#@ import namespace="System.Linq" #>
+<#@ assembly name="Newtonsoft.Json" #><# //There is a bug in System.Text.Json #>
+<#@ import namespace="Newtonsoft.Json" #>
 <#@ import namespace="System.IO" #>
 <#@ import namespace="System.Collections.Generic" #>
-<#@ import namespace="System" #>
-using System.ComponentModel;
-
 namespace Localization.I18N
 {
     // This is an auto-generated file. Do not modify this file manually, if you need to modify the contents, Please motify the I18NKeys.tt file.
     public enum I18NKeys
     {
 <#
-string json = File.ReadAllText(this.Host.ResolvePath("I18NResources/en-US.json"));
-var jsonStr = System.Text.Json.JsonSerializer.Deserialize<List<Dictionary<string, string>>>(json);
-foreach (var item in jsonStr)
-{
-var key = item["Key"];
-var value = item["Value"];
-WriteLine($"        /// <summary>{value}</summary>");
-WriteLine($"        {key},");
-}               
+    string jsonNonLocalized = File.ReadAllText(this.Host.ResolvePath("I18NResources/non-localized.json"));
+    string jsonEn = File.ReadAllText(this.Host.ResolvePath("I18NResources/en-US.json"));
+    var jsonNonLocalizedStr = JsonConvert.DeserializeObject<Dictionary<string, object>[]>(jsonNonLocalized);
+    var jsonEnStr = JsonConvert.DeserializeObject<Dictionary<string, object>[]>(jsonEn);
+    WriteEnum("[Non-Localized] ",jsonNonLocalizedStr);
+    WriteEnum("",jsonEnStr);
 #>
     }
 }
+<#
+void WriteEnum(string head, Dictionary<string, object>[] dictionary)
+{
+    foreach (var item in dictionary)
+    {
+        var key = item["Key"].ToString();
+        if (item.ContainsKey("Value"))
+        {
+            var value = item["Value"].ToString();
+            WriteLine($"        /// <summary>{head}{value}</summary>");
+            WriteLine($"        {key},");
+            continue;
+        }
+        if (item.ContainsKey("Plurals"))
+        {
+            var plurals = JsonConvert.DeserializeObject<Dictionary<string, string>[]>(item["Plurals"].ToString());
+            WriteLine($"        /// <summary>{head}This is a plurals value</summary>");
+            WriteLine($"        /// <remarks>");
+            foreach (var plural in plurals)
+            {
+                var quantity = plural["Quantity"];
+                var value = plural["Value"];
+                WriteLine($"        /// <para>");
+                WriteLine($"        /// [{quantity}]: {value}");
+                WriteLine($"        /// </para>");
+            }
+            WriteLine($"        /// </remarks>");
+            WriteLine($"        {key},");
+            continue;
+        }
+        if (item.ContainsKey("Time"))
+        {
+            var time = JsonConvert.DeserializeObject<Dictionary<string, string>[]>(item["Time"].ToString());
+            WriteLine($"        /// <summary>{head}This is a time value</summary>");
+            WriteLine($"        /// <remarks>");
+            foreach (var t in time)
+            {
+                var unit = t["Unit"];
+                var value = t["Value"];
+                WriteLine($"        /// <para>");
+                WriteLine($"        /// [{unit}]: {value}");
+                WriteLine($"        /// </para>");
+            }
+            WriteLine($"        /// </remarks>");
+            WriteLine($"        {key},");
+            continue;
+        }
+    }
+}
+#>

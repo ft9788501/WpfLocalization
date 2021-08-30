@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -37,6 +38,26 @@ namespace LocalizationDemo
             private bool flag1 = false;
             private string speakingIndicatorSuffix = I18NKeys.SpeakingIndicatorSpeaking.GetLocalizationString();
             private bool enablePseudo = false;
+            private int number = 3;
+            private int time = 0;
+            public int Time
+            {
+                get => time;
+                set
+                {
+                    time = value;
+                    OnPropertyChanged();
+                }
+            }
+            public int Number
+            {
+                get => number;
+                set
+                {
+                    number = value;
+                    OnPropertyChanged();
+                }
+            }
             public string SpeakingIndicatorSuffix
             {
                 get => speakingIndicatorSuffix;
@@ -75,6 +96,12 @@ namespace LocalizationDemo
                 }
             }
 
+            public CultureInfo CurrentCulture
+            {
+                get => I18NManager.CurrentCulture;
+                set => I18NManager.CurrentCulture = value;
+            }
+
             public void SpeakingIndicatorChanged()
             {
                 VersionInfo += "a";
@@ -110,7 +137,7 @@ namespace LocalizationDemo
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var culture = ((ComboBoxItem)((ComboBox)sender).SelectedItem).Content.ToString();
-            I18NManager.SetCulture(culture);
+            //I18NManager.SetCulture(culture);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

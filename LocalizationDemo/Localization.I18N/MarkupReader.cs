@@ -45,7 +45,7 @@ namespace Localization.I18N
             dependencyProperty = dependencyPropertys.FirstOrDefault(p => dependencyObject.ReadLocalValue(p) == DependencyProperty.UnsetValue);
             if (dependencyProperty == null)
             {
-                dependencyProperty = DependencyProperty.RegisterAttached($"{dependencyObject.GetType().Name}{Guid.NewGuid()}" ,
+                dependencyProperty = DependencyProperty.RegisterAttached($"{dependencyObject.GetType().Name}{Guid.NewGuid()}",
                     typeof(object),
                     dependencyObject.GetType(),
                     new PropertyMetadata());

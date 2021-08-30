@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.RegularExpressions;
-using System.Text.Unicode;
 using System.Windows;
 using System.Windows.Resources;
 
@@ -19,55 +15,28 @@ namespace Localization.I18N
 {
     public static class I18NManager
     {
-        class BindingExpressionData : WeakEventListenerAbstract
-        {
-            private readonly object sender;
-            private readonly PropertyInfo propertyInfo;
-            private readonly string[] formatParams;
-
-            public I18NKeys Key { get; set; }
-
-            public BindingExpressionData(I18NKeys key, object sender, PropertyInfo propertyInfo, params string[] formatParams)
-            {
-                Key = key;
-                this.sender = sender;
-                this.propertyInfo = propertyInfo;
-                this.formatParams = formatParams;
-            }
-            ~BindingExpressionData()
-            {
-            }
-
-            public bool Equals(object sender, PropertyInfo propertyInfo)
-            {
-                return this.sender == sender && this.propertyInfo == propertyInfo;
-            }
-
-            #region I18NWeakEventListenerAbstract
-
-            public override void ReceiveWeakEvent()
-            {
-                if (sender is DependencyObject dependencyObject)
-                {
-                    dependencyObject.Dispatcher.Invoke(() =>
-                    {
-                        propertyInfo?.SetValue(sender, Key.GetLocalizationString(formatParams));
-                    });
-                }
-                else
-                {
-                    propertyInfo?.SetValue(sender, Key.GetLocalizationString(formatParams));
-                }
-            }
-
-            #endregion
-        }
-
-        public static event EventHandler CultureChanged;
+        public static event EventHandler<CultureInfo> CultureChanged;
 
         private static bool enablePseudo = false;
-        private static Dictionary<I18NKeys, string> i18nMap = new Dictionary<I18NKeys, string>();
-        private static readonly ConditionalWeakTable<object, List<BindingExpressionData>> bindingExpressionMap = new ConditionalWeakTable<object, List<BindingExpressionData>>();
+        private static CultureInfo currentCulture = null;
+
+        private static readonly Dictionary<CultureInfo, CultureInfo> defaultCultureMap = new Dictionary<CultureInfo, CultureInfo>
+        {
+            { CultureInfo.GetCultureInfo("zh-HK"), CultureInfo.GetCultureInfo("zh-TW") },
+            { CultureInfo.GetCultureInfo("en-AU"), CultureInfo.GetCultureInfo("en-GB") },
+            { CultureInfo.GetCultureInfo("en"), CultureInfo.GetCultureInfo("en-US") },
+            { CultureInfo.GetCultureInfo("de"), CultureInfo.GetCultureInfo("de-DE") },
+            { CultureInfo.GetCultureInfo("es"), CultureInfo.GetCultureInfo("es-419") },
+            { CultureInfo.GetCultureInfo("fr"), CultureInfo.GetCultureInfo("fr-FR") },
+            { CultureInfo.GetCultureInfo("it"), CultureInfo.GetCultureInfo("it-IT") },
+            { CultureInfo.GetCultureInfo("ja"), CultureInfo.GetCultureInfo("ja-JP") },
+            { CultureInfo.GetCultureInfo("pt"), CultureInfo.GetCultureInfo("pt-BR") },
+            { CultureInfo.GetCultureInfo("zh"), CultureInfo.GetCultureInfo("zh-CN") },
+            { CultureInfo.GetCultureInfo("nl"), CultureInfo.GetCultureInfo("nl-NL") },
+            { CultureInfo.GetCultureInfo("ko"), CultureInfo.GetCultureInfo("ko-KR") },
+        };
+        internal static Dictionary<I18NKeys, I18NValue> nonLocalizedMap = new Dictionary<I18NKeys, I18NValue>();
+        internal static Dictionary<I18NKeys, I18NValue> i18nMap = new Dictionary<I18NKeys, I18NValue>();
 
         public static bool EnablePseudo
         {
@@ -78,99 +47,109 @@ namespace Localization.I18N
                 OnCultureChanged();
             }
         }
-
-        private static IEnumerable<ILocalizationFormatter> Formatters
+        public static CultureInfo CurrentCulture
+        {
+            get => currentCulture;
+            set
+            {
+                value = FixCultureInfo(value);
+                if (currentCulture?.Name == value?.Name)
+                {
+                    return;
+                }
+                currentCulture = value;
+                using Stream nonLocalizedJsonStream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"{nameof(Localization)}.{nameof(I18N)}.I18NResources.non-localized.json");
+                using Stream cultureJsonStream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"{nameof(Localization)}.{nameof(I18N)}.I18NResources.{value.Name}.json");
+                using StreamReader nonLocalizedJsonStreamReader = new StreamReader(nonLocalizedJsonStream, Encoding.UTF8);
+                using StreamReader cultureJsonStreamReader = new StreamReader(cultureJsonStream, Encoding.UTF8);
+                string nonLocalizedJson = nonLocalizedJsonStreamReader.ReadToEnd();
+                string cultureJson = cultureJsonStreamReader.ReadToEnd();
+                LoadFromJson(nonLocalizedJson, cultureJson);
+            }
+        }
+        public static IEnumerable<CultureInfo> SupportCultureList
         {
             get
             {
-                yield return ILocalizationFormatter.ArgsStringFormatter;
-                if (EnablePseudo)
-                {
-                    yield return ILocalizationFormatter.PseudoFormatter;
-                }
+                yield return CultureInfo.GetCultureInfo("en-US");
+                yield return CultureInfo.GetCultureInfo("it-IT");
+                yield return CultureInfo.GetCultureInfo("pt-BR");
+                yield return CultureInfo.GetCultureInfo("zh-CN");
+                yield return CultureInfo.GetCultureInfo("zh-TW");
+                yield return CultureInfo.GetCultureInfo("de-DE");
+                yield return CultureInfo.GetCultureInfo("fr-FR");
+                yield return CultureInfo.GetCultureInfo("fr-CA");
+                yield return CultureInfo.GetCultureInfo("es-ES");
+                yield return CultureInfo.GetCultureInfo("es-419");
+                yield return CultureInfo.GetCultureInfo("ja-JP");
+                yield return CultureInfo.GetCultureInfo("en-GB");
+                yield return CultureInfo.GetCultureInfo("zh-HK");
+                yield return CultureInfo.GetCultureInfo("en-AU");
+                yield return CultureInfo.GetCultureInfo("ko-KR");
+                yield return CultureInfo.GetCultureInfo("nl-NL");
+                yield return CultureInfo.GetCultureInfo("pt-PT");
+                yield return CultureInfo.GetCultureInfo("fi-FI");
             }
         }
 
         static I18NManager()
         {
-            var properties = Enum.GetValues(typeof(I18NKeys))
-                 .Cast<object>()
-                 .Select(e => new KeyValuePair<I18NKeys, string>((I18NKeys)e, e.GetType().GetField(e.ToString()).GetCustomAttribute<DescriptionAttribute>()?.Description));
-            Dictionary<I18NKeys, string> i18nMap = new Dictionary<I18NKeys, string>();
-            foreach (var property in properties)
-            {
-                i18nMap.Add(property.Key, property.Value);
-            }
-            I18NManager.i18nMap = i18nMap;
+            CurrentCulture = CultureInfo.CurrentCulture;
         }
 
-        public static string GetLocalizationString(this I18NKeys i18NKeys, params string[] formatParams)
+        /// <summary>
+        /// https://docs.google.com/spreadsheets/d/1P5hXOTJyiBR1WFW9h967ilztUvuZtBhaY91bt432uH4/edit#gid=15186963
+        /// </summary>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        private static CultureInfo FixCultureInfo(CultureInfo culture)
         {
-            return Format(i18nMap[i18NKeys], formatParams);
-        }
-
-        private static string Format(string originString, params string[] formatParams)
-        {
-            foreach (var formatter in Formatters)
+            using Stream cultureJsonStream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"{nameof(Localization)}.{nameof(I18N)}.I18NResources.{culture.Name}.json");
+            if (cultureJsonStream == null)
             {
-                originString = formatter.Format(originString, formatParams);
-            }
-            return originString;
-        }
-
-        public static void BindingExpression<T>(this I18NKeys i18NKey, T sender, Expression<Func<T, object>> memberLambda, params string[] formatParams)
-        {
-            if (!bindingExpressionMap.TryGetValue(sender, out List<BindingExpressionData> bindingExpressionDatas))
-            {
-                bindingExpressionDatas = new List<BindingExpressionData>();
-                bindingExpressionMap.Add(sender, bindingExpressionDatas);
-            }
-            var memberExpression = memberLambda.Body as MemberExpression;
-            var property = memberExpression?.Member as PropertyInfo;
-            if (property != null)
-            {
-                var bindingExpressionData = bindingExpressionDatas.FirstOrDefault(b => b.Equals(sender, property));
-                if (bindingExpressionData == null)
+                if (defaultCultureMap.TryGetValue(culture, out CultureInfo sameCultureInfo))
                 {
-                    bindingExpressionData = new BindingExpressionData(i18NKey, sender, property, formatParams);
-                    bindingExpressionDatas.Add(bindingExpressionData);
+                    return FixCultureInfo(sameCultureInfo);
                 }
-                if (bindingExpressionData.Key != i18NKey)
+                else if (defaultCultureMap.TryGetValue(CultureInfo.GetCultureInfo(culture.TwoLetterISOLanguageName), out CultureInfo sameParentCultureInfo) && culture.Name != sameParentCultureInfo.Name)
                 {
-                    bindingExpressionData.Key = i18NKey;
+                    return FixCultureInfo(sameParentCultureInfo);
                 }
-                bindingExpressionData.ReceiveWeakEvent();
+                else
+                {
+                    return FixCultureInfo(CultureInfo.GetCultureInfo("en-US"));
+                }
+            }
+            else
+            {
+                return culture;
             }
         }
 
-        public static bool LoadFromJson(string path)
-        {
-            if (!File.Exists(path))
-            {
-                return false;
-            }
-            try
-            {
-                var json = File.ReadAllText(path);
-                return LoadFromJsonStr(json);
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public static bool LoadFromJsonStr(string json)
+        private static bool LoadFromJson(string nonLocalizedJson, string cultureJson)
         {
             try
             {
-                var dictionary = JsonSerializer.Deserialize<Dictionary<string, string>[]>(json);
-                Dictionary<I18NKeys, string> i18nMap = new Dictionary<I18NKeys, string>();
-                foreach (var property in dictionary)
+                Dictionary<I18NKeys, I18NValue> nonLocalizedMap = new Dictionary<I18NKeys, I18NValue>();
+                Dictionary<I18NKeys, I18NValue> i18nMap = new Dictionary<I18NKeys, I18NValue>();
+                var nonLocalizedJsonDictionary = JsonSerializer.Deserialize<Dictionary<string, object>[]>(nonLocalizedJson);
+                var cultureJsonDictionary = JsonSerializer.Deserialize<Dictionary<string, object>[]>(cultureJson);
+                foreach (var property in nonLocalizedJsonDictionary)
                 {
-                    var key = property["Key"];
-                    var value = property["Value"];
-                    i18nMap.Add(Enum.Parse<I18NKeys>(key), value);
+                    var key = property["Key"].ToString();
+                    if (I18NValue.CreateI18NValue(property) is I18NValue value)
+                    {
+                        nonLocalizedMap.Add(Enum.Parse<I18NKeys>(key), value);
+                    }
+                }
+                I18NManager.nonLocalizedMap = nonLocalizedMap;
+                foreach (var property in cultureJsonDictionary)
+                {
+                    var key = property["Key"].ToString();
+                    if (I18NValue.CreateI18NValue(property) is I18NValue value)
+                    {
+                        i18nMap.Add(Enum.Parse<I18NKeys>(key), value);
+                    }
                 }
                 I18NManager.i18nMap = i18nMap;
                 OnCultureChanged();
@@ -182,20 +161,9 @@ namespace Localization.I18N
             }
         }
 
-        public static void SetCulture(string culture)
-        {
-            Uri uri = new Uri(@$"pack://application:,,,/Localization.I18N;component/I18NResources/{culture}.json", UriKind.Absolute);
-            StreamResourceInfo info = Application.GetResourceStream(uri);
-            using (info.Stream)
-            {
-                using StreamReader streamReader = new StreamReader(info.Stream, Encoding.UTF8);
-                string json = streamReader.ReadToEnd();
-                LoadFromJsonStr(json);
-            }
-        }
         private static void OnCultureChanged()
         {
-            CultureChanged?.Invoke(null, EventArgs.Empty);
+            CultureChanged?.Invoke(null, currentCulture);
         }
     }
 }

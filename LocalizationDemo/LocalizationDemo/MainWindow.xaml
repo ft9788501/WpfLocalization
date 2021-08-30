@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LocalizationDemo"
         xmlns:i18n="clr-namespace:Localization.I18N;assembly=Localization.I18N"
-        mc:Ignorable="d" Height="450" Width="800" Title="{i18n:I18N Key=Title}">
+        mc:Ignorable="d" Height="450" Width="800" Title="{i18n:I18NKeyBinding Key=Title}">
     <Grid>
         <StackPanel Width="200" VerticalAlignment="Top" HorizontalAlignment="Left">
             <StackPanel  Background="Yellow">
@@ -28,14 +28,21 @@
             <StackPanel  Background="LightCoral">
                 <TextBlock Text="Xaml Format"/>
                 <TextBlock Text="{Binding VersionInfo}"/>
-                <TextBlock Text="{i18n:I18N {Binding VersionInfo},Key=Version}"/>
+                <TextBlock Text="{i18n:I18NKeyBinding {Binding VersionInfo},Key=Version}"/>
+            </StackPanel>
+            <StackPanel  Background="LightCyan">
+                <TextBlock Text="Plurals"/>
+                <TextBox Text="{Binding Number,UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="{i18n:I18NKeyBinding {Binding Number},Key=TestPluralsString}"/>
+            </StackPanel>
+            <StackPanel  Background="LightGreen">
+                <TextBlock Text="Time"/>
+                <TextBox Text="{Binding Time,UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="{i18n:I18NKeyBinding {Binding Time},Key=TestTimeString}"/>
             </StackPanel>
         </StackPanel>
         <StackPanel Width="150" VerticalAlignment="Top" HorizontalAlignment="Right">
-            <ComboBox Width="150" Height="25" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged">
-                <ComboBoxItem Content="en-US"/>
-                <ComboBoxItem Content="zh-CN"/>
-            </ComboBox>
+            <ComboBox Width="150" Height="25" SelectedItem="{Binding CurrentCulture}" ItemsSource="{x:Static i18n:I18NManager.SupportCultureList}"/>
             <Button Width="150" Height="25" Content="ShowNewWindow" Click="Button_Click"/>
             <Button Width="150" Height="25" Content="MessageBox" Click="Button_Click_1"/>
             <Button Width="150" Height="25" Content="SpeakingIndicatorChanged" Click="Button_Click_2"/>
