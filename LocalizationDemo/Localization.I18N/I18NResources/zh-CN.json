@@ -45,10 +45,10 @@
   },
   {
     "Key": "FormatString",
-    "Value": "这是一个{old device}而他将要切换到{new device}。"
+    "Value": "这是一个{l_old device}而他将要切换到{l_new device}。"
   },
   {
     "Key": "Version",
-    "Value": "版本号 ({version number})。"
+    "Value": "版本号 ({l_version number})。"
   }
 ]

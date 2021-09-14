@@ -8,17 +8,17 @@ namespace Localization.I18N
 {
     internal static class StringFormatterHelper
     {
-        public static string Format(string originString, params string[] formatParams)
+        public static string Format(string originString, bool enablePseudo, params string[] formatParams)
         {
             if (string.IsNullOrEmpty(originString))
             {
                 return originString;
             }
-            var pattern = @"\{rcrooms_[^\}]+\}";
+            var pattern = @"\{l_[^\}]+\}";
             var matches = Regex.Matches(originString, pattern);
             if (matches.Count == 0)
             {
-                return originString;
+                return enablePseudo ? PseudoHelper.GetPseudoString(originString) : originString;
             }
             else
             {
@@ -28,7 +28,7 @@ namespace Localization.I18N
                     StringBuilder stringBuilder = new StringBuilder();
                     for (int i = 0; i < splits.Length; i++)
                     {
-                        stringBuilder.Append(splits[i]);
+                        stringBuilder.Append(enablePseudo ? PseudoHelper.GetPseudoString(splits[i]) : splits[i]);
                         if (i != splits.Length - 1)
                         {
                             stringBuilder.Append(formatParams[i]);
@@ -38,12 +38,12 @@ namespace Localization.I18N
                 }
                 else
                 {
-                    return originString;
+                    return enablePseudo ? PseudoHelper.GetPseudoString(originString) : originString;
                 }
             }
         }
 
-        public static IEnumerable<string> FormatBlock(string originString, params string[] formatParams)
+        public static IEnumerable<string> FormatBlock(string originString, bool enablePseudo, params string[] formatParams)
         {
             if (string.IsNullOrEmpty(originString))
             {
@@ -53,7 +53,7 @@ namespace Localization.I18N
             var matches = Regex.Matches(originString, pattern);
             if (matches.Count == 0)
             {
-                yield return originString;
+                yield return enablePseudo ? PseudoHelper.GetPseudoString(originString) : originString;
             }
             else
             {
@@ -62,7 +62,7 @@ namespace Localization.I18N
                 {
                     for (int i = 0; i < splits.Length; i++)
                     {
-                        yield return splits[i];
+                        yield return enablePseudo ? PseudoHelper.GetPseudoString(splits[i]) : splits[i];
                         if (i != splits.Length - 1)
                         {
                             yield return formatParams[i];
@@ -71,7 +71,7 @@ namespace Localization.I18N
                 }
                 else
                 {
-                    yield return originString;
+                    yield return enablePseudo ? PseudoHelper.GetPseudoString(originString) : originString;
                 }
             }
         }

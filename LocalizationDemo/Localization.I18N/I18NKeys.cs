@@ -6,23 +6,23 @@
         /// <summary>[Non-Localized] This is a time value</summary>
         /// <remarks>
         /// <para>
-        /// [Ms]: Meeting will end after {rcrooms_seconds} Milliseconds
+        /// [Ms]: Meeting will end after {l_seconds} Milliseconds
         /// </para>
         /// <para>
-        /// [Sec]: Meeting will end after {rcrooms_seconds} Seconds
+        /// [Sec]: Meeting will end after {l_seconds} Seconds
         /// </para>
         /// <para>
-        /// [Min]: Meeting will end after {rcrooms_seconds} Minute
+        /// [Min]: Meeting will end after {l_seconds} Minute
         /// </para>
         /// </remarks>
         TestTimeString,
         /// <summary>[Non-Localized] This is a plurals value</summary>
         /// <remarks>
         /// <para>
-        /// [one]: This is {rcrooms_participant_number} participant
+        /// [One]: This is {l_participant_number} participant
         /// </para>
         /// <para>
-        /// [few]: There are {rcrooms_participant_number} participants
+        /// [Few]: There are {l_participant_number} participants
         /// </para>
         /// </remarks>
         TestPluralsString,
@@ -64,9 +64,9 @@
         SpeakingIndicatorSpeaking,
         /// <summary>is Reconnecting</summary>
         SpeakingIndicatorReconnecting,
-        /// <summary>This is a {old device} and will switch to {new device} .</summary>
+        /// <summary>This is a {l_old device} and will switch to {l_new device} .</summary>
         FormatString,
-        /// <summary>Version ({version number}).</summary>
+        /// <summary>Version ({l_version number}).</summary>
         Version,
     }
 }

@@ -1,5 +1,0 @@
-<Project>
-  <ItemGroup>
-    <EmbeddedResource Include="I18NResources\zh-CN.json" />
-  </ItemGroup>
-</Project>

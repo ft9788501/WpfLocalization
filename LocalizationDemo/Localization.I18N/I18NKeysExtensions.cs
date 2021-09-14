@@ -54,9 +54,9 @@ namespace Localization.I18N
 
             #endregion
         }
-     
+
         private static readonly ConditionalWeakTable<object, List<BindingExpressionData>> bindingExpressionMap = new ConditionalWeakTable<object, List<BindingExpressionData>>();
-       
+
         public static string GetLocalizationString(this I18NKeys i18NKey, params string[] formatParams)
         {
             string rawString;
@@ -64,17 +64,13 @@ namespace Localization.I18N
             {
                 rawString = I18NManager.nonLocalizedMap[i18NKey].GetMultiConditionValue(out string[] convertedParams, formatParams);
                 formatParams = convertedParams;
-                rawString = StringFormatterHelper.Format(rawString, formatParams);
+                rawString = StringFormatterHelper.Format(rawString, I18NManager.EnablePseudo, formatParams);
             }
             else
             {
                 rawString = I18NManager.i18nMap[i18NKey].GetMultiConditionValue(out string[] convertedParams, formatParams);
                 formatParams = convertedParams;
-                rawString = StringFormatterHelper.Format(rawString, formatParams);
-                if (I18NManager.EnablePseudo)
-                {
-                    rawString = PseudoHelper.GetPseudoString(rawString);
-                }
+                rawString = StringFormatterHelper.Format(rawString, I18NManager.EnablePseudo, formatParams);
             }
             return rawString;
         }
@@ -106,19 +102,29 @@ namespace Localization.I18N
             {
                 var rawString = I18NManager.nonLocalizedMap[i18NKey].GetMultiConditionValue(out string[] convertedParams, formatParams);
                 formatParams = convertedParams;
-                blockStrings = StringFormatterHelper.FormatBlock(rawString, formatParams);
+                blockStrings = StringFormatterHelper.FormatBlock(rawString, I18NManager.EnablePseudo, formatParams);
             }
             else
             {
                 var rawString = I18NManager.i18nMap[i18NKey].GetMultiConditionValue(out string[] convertedParams, formatParams);
                 formatParams = convertedParams;
-                blockStrings = StringFormatterHelper.FormatBlock(rawString, formatParams);
-                if (I18NManager.EnablePseudo)
-                {
-                    blockStrings = blockStrings.Select(b => PseudoHelper.GetPseudoString(b));
-                }
+                blockStrings = StringFormatterHelper.FormatBlock(rawString, I18NManager.EnablePseudo, formatParams);
             }
             return blockStrings;
+        }
+
+        public static string GetLocalizationRawValue(this I18NKeys i18NKey)
+        {
+            string rawString;
+            if (I18NManager.nonLocalizedMap.ContainsKey(i18NKey))
+            {
+                rawString = I18NManager.nonLocalizedMap[i18NKey].GetAllValues();
+            }
+            else
+            {
+                rawString = I18NManager.i18nMap[i18NKey].GetAllValues();
+            }
+            return rawString;
         }
 
         /// <summary>

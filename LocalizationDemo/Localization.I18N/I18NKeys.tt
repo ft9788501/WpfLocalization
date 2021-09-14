@@ -31,6 +31,8 @@ void WriteEnum(string head, Dictionary<string, object>[] dictionary)
         if (item.ContainsKey("Value"))
         {
             var value = item["Value"].ToString();
+            value = value.Replace("\n","\\n");
+            value = value.Replace("\r","\\r");
             WriteLine($"        /// <summary>{head}{value}</summary>");
             WriteLine($"        {key},");
             continue;
@@ -44,6 +46,8 @@ void WriteEnum(string head, Dictionary<string, object>[] dictionary)
             {
                 var quantity = plural["Quantity"];
                 var value = plural["Value"];
+                value = value.Replace("\n","\\n");
+                value = value.Replace("\r","\\r");
                 WriteLine($"        /// <para>");
                 WriteLine($"        /// [{quantity}]: {value}");
                 WriteLine($"        /// </para>");
@@ -61,6 +65,8 @@ void WriteEnum(string head, Dictionary<string, object>[] dictionary)
             {
                 var unit = t["Unit"];
                 var value = t["Value"];
+                value = value.Replace("\n","\\n");
+                value = value.Replace("\r","\\r");
                 WriteLine($"        /// <para>");
                 WriteLine($"        /// [{unit}]: {value}");
                 WriteLine($"        /// </para>");

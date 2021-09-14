@@ -20,6 +20,11 @@ namespace Localization.I18N
                 convertedParams = @params;
                 return value;
             }
+
+            public override string GetAllValues()
+            {
+                return value;
+            }
         }
         class I18NValuePlurals : I18NValue
         {
@@ -79,6 +84,11 @@ namespace Localization.I18N
                 }
                 return pluralsBlock.FirstOrDefault(t => t.Quantity == PluralsQuantity.Other)?.Value;
             }
+
+            public override string GetAllValues()
+            {
+                return string.Join("\r\n", pluralsBlock.Select(t => t.Value));
+            }
         }
         class I18NValueTime : I18NValue
         {
@@ -125,6 +135,11 @@ namespace Localization.I18N
                 }
                 return timeBlocks.FirstOrDefault(t => t.Unit == TimeUnit.Sec)?.Value; ;
             }
+
+            public override string GetAllValues()
+            {
+                return string.Join("\r\n", timeBlocks.Select(t => t.Value));
+            }
         }
 
         /// <summary>
@@ -134,6 +149,7 @@ namespace Localization.I18N
         /// <param name="params"></param>
         /// <returns></returns>
         public abstract string GetMultiConditionValue(out string[] convertedParams, params string[] @params);
+        public abstract string GetAllValues();
 
         public static I18NValue CreateI18NValue(Dictionary<string, object> dictionary)
         {

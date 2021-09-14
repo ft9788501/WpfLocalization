@@ -45,10 +45,10 @@
   },
   {
     "Key": "FormatString",
-    "Value": "This is a {old device} and will switch to {new device} ."
+    "Value": "This is a {l_old device} and will switch to {l_new device} ."
   },
   {
     "Key": "Version",
-    "Value": "Version ({version number})."
+    "Value": "Version ({l_version number})."
   }
 ]

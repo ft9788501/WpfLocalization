@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -52,14 +53,16 @@ namespace Localization.I18N
             get => currentCulture;
             set
             {
+                Trace.WriteLine($"Set current culture {value.Name}");
                 value = FixCultureInfo(value);
+                Trace.WriteLine($"Set fixed culture {value.Name}");
                 if (currentCulture?.Name == value?.Name)
                 {
                     return;
                 }
                 currentCulture = value;
-                using Stream nonLocalizedJsonStream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"{nameof(Localization)}.{nameof(I18N)}.I18NResources.non-localized.json");
-                using Stream cultureJsonStream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"{nameof(Localization)}.{nameof(I18N)}.I18NResources.{value.Name}.json");
+                using Stream nonLocalizedJsonStream = GetStreamByCultureName("non-localized");
+                using Stream cultureJsonStream = GetStreamByCultureName(value.Name);
                 using StreamReader nonLocalizedJsonStreamReader = new StreamReader(nonLocalizedJsonStream, Encoding.UTF8);
                 using StreamReader cultureJsonStreamReader = new StreamReader(cultureJsonStream, Encoding.UTF8);
                 string nonLocalizedJson = nonLocalizedJsonStreamReader.ReadToEnd();
@@ -67,46 +70,42 @@ namespace Localization.I18N
                 LoadFromJson(nonLocalizedJson, cultureJson);
             }
         }
-        public static IEnumerable<CultureInfo> SupportCultureList
-        {
-            get
-            {
-                yield return CultureInfo.GetCultureInfo("en-US");
-                yield return CultureInfo.GetCultureInfo("it-IT");
-                yield return CultureInfo.GetCultureInfo("pt-BR");
-                yield return CultureInfo.GetCultureInfo("zh-CN");
-                yield return CultureInfo.GetCultureInfo("zh-TW");
-                yield return CultureInfo.GetCultureInfo("de-DE");
-                yield return CultureInfo.GetCultureInfo("fr-FR");
-                yield return CultureInfo.GetCultureInfo("fr-CA");
-                yield return CultureInfo.GetCultureInfo("es-ES");
-                yield return CultureInfo.GetCultureInfo("es-419");
-                yield return CultureInfo.GetCultureInfo("ja-JP");
-                yield return CultureInfo.GetCultureInfo("en-GB");
-                yield return CultureInfo.GetCultureInfo("zh-HK");
-                yield return CultureInfo.GetCultureInfo("en-AU");
-                yield return CultureInfo.GetCultureInfo("ko-KR");
-                yield return CultureInfo.GetCultureInfo("nl-NL");
-                yield return CultureInfo.GetCultureInfo("pt-PT");
-                yield return CultureInfo.GetCultureInfo("fi-FI");
-            }
-        }
+
+        public static IEnumerable<CultureInfo> SupportCultureList { get; } = EmbeddedCultureFileList
+            .Where(x => x != $"{nameof(Localization)}.I18N.I18NResources.non-localized.json")
+            .Select(x => x.Replace($"{nameof(Localization)}.I18N.I18NResources.", ""))
+            .Select(x => Path.GetFileNameWithoutExtension(x))
+            .Select(x => CultureInfo.GetCultureInfo(x));
+
+        private static IEnumerable<string> EmbeddedCultureFileList => Assembly.GetExecutingAssembly()
+            .GetManifestResourceNames()
+            .Where(x => x.Contains($"{nameof(Localization)}.I18N.I18NResources"))
+            .Where(x => Path.GetExtension(x) == ".json");
 
         static I18NManager()
         {
+            Trace.WriteLine($"I18NManager support cultures {string.Join("\r\n", SupportCultureList.Select(x => x.Name))}");
+            Trace.WriteLine($"I18NManager init {CultureInfo.CurrentCulture.Name}");
             CurrentCulture = CultureInfo.CurrentCulture;
         }
 
-        /// <summary>
-        /// https://docs.google.com/spreadsheets/d/1P5hXOTJyiBR1WFW9h967ilztUvuZtBhaY91bt432uH4/edit#gid=15186963
-        /// </summary>
-        /// <param name="culture"></param>
-        /// <returns></returns>
+        private static Stream GetStreamByCultureName(string cultureName)
+        {
+            var manifestResourcePath = EmbeddedCultureFileList.FirstOrDefault(x => x.Replace($"{nameof(Localization)}.I18N.I18NResources.", "") == $"{cultureName}.json");
+            if (manifestResourcePath == null)
+            {
+                return null;
+            }
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(manifestResourcePath);
+            return stream;
+        }
+
         private static CultureInfo FixCultureInfo(CultureInfo culture)
         {
-            using Stream cultureJsonStream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"{nameof(Localization)}.{nameof(I18N)}.I18NResources.{culture.Name}.json");
+            using Stream cultureJsonStream = GetStreamByCultureName(culture.Name);
             if (cultureJsonStream == null)
             {
+                Trace.WriteLine($"Fix culture {culture.Name}");
                 if (defaultCultureMap.TryGetValue(culture, out CultureInfo sameCultureInfo))
                 {
                     return FixCultureInfo(sameCultureInfo);
@@ -134,6 +133,7 @@ namespace Localization.I18N
                 Dictionary<I18NKeys, I18NValue> i18nMap = new Dictionary<I18NKeys, I18NValue>();
                 var nonLocalizedJsonDictionary = JsonSerializer.Deserialize<Dictionary<string, object>[]>(nonLocalizedJson);
                 var cultureJsonDictionary = JsonSerializer.Deserialize<Dictionary<string, object>[]>(cultureJson);
+                Trace.WriteLine($"Load from json culture [nonLocalized:{nonLocalizedJsonDictionary.Count()}|culture:{cultureJsonDictionary.Count()}]");
                 foreach (var property in nonLocalizedJsonDictionary)
                 {
                     var key = property["Key"].ToString();
