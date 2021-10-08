@@ -64,13 +64,13 @@ namespace Localization.I18N
             {
                 rawString = I18NManager.nonLocalizedMap[i18NKey].GetMultiConditionValue(out string[] convertedParams, formatParams);
                 formatParams = convertedParams;
-                rawString = StringFormatterHelper.Format(rawString, I18NManager.EnablePseudo, formatParams);
+                rawString = StringFormatterHelper.Format(rawString, formatParams);
             }
             else
             {
                 rawString = I18NManager.i18nMap[i18NKey].GetMultiConditionValue(out string[] convertedParams, formatParams);
                 formatParams = convertedParams;
-                rawString = StringFormatterHelper.Format(rawString, I18NManager.EnablePseudo, formatParams);
+                rawString = StringFormatterHelper.Format(rawString, formatParams);
             }
             return rawString;
         }
@@ -102,13 +102,13 @@ namespace Localization.I18N
             {
                 var rawString = I18NManager.nonLocalizedMap[i18NKey].GetMultiConditionValue(out string[] convertedParams, formatParams);
                 formatParams = convertedParams;
-                blockStrings = StringFormatterHelper.FormatBlock(rawString, I18NManager.EnablePseudo, formatParams);
+                blockStrings = StringFormatterHelper.FormatBlock(rawString, formatParams);
             }
             else
             {
                 var rawString = I18NManager.i18nMap[i18NKey].GetMultiConditionValue(out string[] convertedParams, formatParams);
                 formatParams = convertedParams;
-                blockStrings = StringFormatterHelper.FormatBlock(rawString, I18NManager.EnablePseudo, formatParams);
+                blockStrings = StringFormatterHelper.FormatBlock(rawString, formatParams);
             }
             return blockStrings;
         }
