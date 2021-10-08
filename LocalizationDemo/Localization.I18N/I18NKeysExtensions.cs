@@ -15,16 +15,16 @@ namespace Localization.I18N
         {
             private readonly object sender;
             private readonly PropertyInfo propertyInfo;
-            private readonly string[] formatParams;
 
             public I18NKeys Key { get; set; }
+            public string[] FormatParams { get; set; }
 
             public BindingExpressionData(I18NKeys key, object sender, PropertyInfo propertyInfo, params string[] formatParams)
             {
                 Key = key;
                 this.sender = sender;
                 this.propertyInfo = propertyInfo;
-                this.formatParams = formatParams;
+                FormatParams = formatParams;
             }
             ~BindingExpressionData()
             {
@@ -43,12 +43,12 @@ namespace Localization.I18N
                 {
                     dependencyObject.Dispatcher.Invoke(() =>
                     {
-                        propertyInfo?.SetValue(sender, Key.GetLocalizationString(formatParams));
+                        propertyInfo?.SetValue(sender, Key.GetLocalizationString(FormatParams));
                     });
                 }
                 else
                 {
-                    propertyInfo?.SetValue(sender, Key.GetLocalizationString(formatParams));
+                    propertyInfo?.SetValue(sender, Key.GetLocalizationString(FormatParams));
                 }
             }
 
@@ -157,9 +157,16 @@ namespace Localization.I18N
                     bindingExpressionData = new BindingExpressionData(i18NKey, sender, property, formatParams);
                     bindingExpressionDatas.Add(bindingExpressionData);
                 }
-                if (bindingExpressionData.Key != i18NKey)
+                else
                 {
-                    bindingExpressionData.Key = i18NKey;
+                    if (bindingExpressionData.Key != i18NKey)
+                    {
+                        bindingExpressionData.Key = i18NKey;
+                    }
+                    if (bindingExpressionData.FormatParams != formatParams)
+                    {
+                        bindingExpressionData.FormatParams = formatParams;
+                    }
                 }
                 bindingExpressionData.ReceiveWeakEvent();
             }
