@@ -16,7 +16,26 @@ namespace Localization.I18N
 {
     public static class I18NManager
     {
-        public static event EventHandler<CultureInfo> CultureChanged;
+        private static List<WeakReference<EventHandler<CultureInfo>>> eventHandlers;
+
+        public static event EventHandler<CultureInfo> CultureChanged
+        {
+            add
+            {
+                eventHandlers.Add(new WeakReference<EventHandler<CultureInfo>>(value));
+            }
+            remove
+            {
+                eventHandlers.RemoveAll(wr =>
+                {
+                    if (wr.TryGetTarget(out EventHandler<CultureInfo> targetHandler))
+                    {
+                        return targetHandler == value;
+                    }
+                    return false;
+                });
+            }
+        }
 
         private static bool enablePseudo = false;
         private static CultureInfo currentCulture = null;
@@ -84,6 +103,7 @@ namespace Localization.I18N
 
         static I18NManager()
         {
+            eventHandlers = new List<WeakReference<EventHandler<CultureInfo>>>();
             Trace.WriteLine($"I18NManager support cultures {string.Join("\r\n", SupportCultureList.Select(x => x.Name))}");
             Trace.WriteLine($"I18NManager init {CultureInfo.CurrentCulture.Name}");
             CurrentCulture = CultureInfo.CurrentCulture;
@@ -163,7 +183,13 @@ namespace Localization.I18N
 
         private static void OnCultureChanged()
         {
-            CultureChanged?.Invoke(null, currentCulture);
+            foreach (WeakReference<EventHandler<CultureInfo>> wr in eventHandlers)
+            {
+                if (wr.TryGetTarget(out EventHandler<CultureInfo> targetHandler))
+                {
+                    targetHandler.Invoke(targetHandler.Target, currentCulture);
+                }
+            }
         }
     }
 }
