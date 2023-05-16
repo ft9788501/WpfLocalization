@@ -14,7 +14,7 @@ namespace Localization.I18N
             {
                 return originString;
             }
-            var pattern = @"\{rcrooms_[^\}]+\}";
+            var pattern = @"\{l_[^\}]+\}";
             var matches = Regex.Matches(originString, pattern);
             var enablePseudo = I18NManager.EnablePseudo;
             if (matches.Count == 0)
