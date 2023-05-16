@@ -123,7 +123,7 @@ namespace LocalizationDemo
         {
             InitializeComponent();
             DataContext = viewModel;
-            I18NKeys.Title.ToString();
+            I18NKeys.Title.GetLocalizationString();
             I18NKeys.Name.BindingExpression(textblock1, x => x.Text);
             I18NKeys.Age.BindingExpression(textblock2, x => x.Text);
             textblock3.Text = $"{I18NKeys.String1.GetLocalizationString()}+{I18NKeys.String2.GetLocalizationString()}";

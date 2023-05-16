@@ -35,8 +35,4 @@
     </Compile>
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="&quot;$(DevEnvDir)TextTransform.exe&quot; &quot;$(ProjectDir)\I18NKeys.tt&quot;" />
-  </Target>
-
 </Project>
