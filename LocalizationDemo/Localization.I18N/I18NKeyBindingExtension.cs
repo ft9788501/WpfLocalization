@@ -42,7 +42,7 @@ namespace Localization.I18N
 
             }
         }
-        class BindingData : CultureChangedWeakEventListenerAbstract, INotifyPropertyChanged
+        class BindingData : CultureChangedReceiverAbstract, INotifyPropertyChanged
         {
             private readonly I18NKeys key;
             private IEnumerable<BindingArgument> bindingArgs;
@@ -55,11 +55,11 @@ namespace Localization.I18N
                 {
                     Binding.AddTargetUpdatedHandler(dependencyObject, (s, e) =>
                     {
-                        ReceiveWeakEvent();
+                        OnCultureChanged();
                     });
                     Binding.AddSourceUpdatedHandler(dependencyObject, (s, e) =>
                     {
-                        ReceiveWeakEvent();
+                        OnCultureChanged();
                     });
                 }
             }
@@ -82,9 +82,9 @@ namespace Localization.I18N
 
             #endregion
 
-            #region I18NWeakEventListenerAbstract
+            #region CultureChangedReceiverAbstract
 
-            public override void ReceiveWeakEvent()
+            public override void OnCultureChanged()
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
             }

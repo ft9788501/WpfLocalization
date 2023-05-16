@@ -11,7 +11,7 @@ namespace Localization.I18N
 {
     public static class I18NKeysExtensions
     {
-        class BindingExpressionData : CultureChangedWeakEventListenerAbstract
+        class BindingExpressionData : CultureChangedReceiverAbstract
         {
             private readonly object sender;
             private readonly PropertyInfo propertyInfo;
@@ -35,9 +35,9 @@ namespace Localization.I18N
                 return this.sender == sender && this.propertyInfo == propertyInfo;
             }
 
-            #region I18NWeakEventListenerAbstract
+            #region CultureChangedReceiverAbstract
 
-            public override void ReceiveWeakEvent()
+            public override void OnCultureChanged()
             {
                 if (sender is DependencyObject dependencyObject)
                 {
@@ -168,7 +168,7 @@ namespace Localization.I18N
                         bindingExpressionData.FormatParams = formatParams;
                     }
                 }
-                bindingExpressionData.ReceiveWeakEvent();
+                bindingExpressionData.OnCultureChanged();
             }
         }
 
