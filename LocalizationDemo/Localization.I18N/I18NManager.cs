@@ -9,8 +9,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using System.Windows;
-using System.Windows.Resources;
 
 namespace Localization.I18N
 {

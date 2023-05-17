@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Avalonia;
+using Avalonia.Markup.Xaml;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Windows;
-using System.Windows.Markup;
 
 namespace Localization.I18N
 {
@@ -27,32 +27,32 @@ namespace Localization.I18N
             }
         }
 
-        private static readonly ConditionalWeakTable<DependencyObject, List<DependencyProperty>> dependencyMap = new ConditionalWeakTable<DependencyObject, List<DependencyProperty>>();
+        private static readonly ConditionalWeakTable<AvaloniaObject, List<AvaloniaProperty>> dependencyMap = new ConditionalWeakTable<AvaloniaObject, List<AvaloniaProperty>>();
 
-        private readonly DependencyObject dependencyObject;
-        private readonly DependencyProperty dependencyProperty;
+        private readonly AvaloniaObject avaloniaObject;
+        private readonly AvaloniaProperty avaloniaProperty;
 
-        public object Value => dependencyObject.GetValue(dependencyProperty);
+        public object Value => avaloniaObject.GetValue(avaloniaProperty);
 
-        public MarkupReader(DependencyObject dependencyObject, MarkupExtension markup)
+        public MarkupReader(AvaloniaObject avaloniaObject, MarkupExtension markup)
         {
-            this.dependencyObject = dependencyObject;
-            if (!dependencyMap.TryGetValue(dependencyObject, out List<DependencyProperty> dependencyPropertys))
+            this.avaloniaObject = avaloniaObject;
+            if (!dependencyMap.TryGetValue(avaloniaObject, out List<AvaloniaProperty> dependencyPropertys))
             {
-                dependencyPropertys = new List<DependencyProperty>();
-                dependencyMap.Add(dependencyObject, dependencyPropertys);
+                dependencyPropertys = new List<AvaloniaProperty>();
+                dependencyMap.Add(avaloniaObject, dependencyPropertys);
             }
-            dependencyProperty = dependencyPropertys.FirstOrDefault(p => dependencyObject.ReadLocalValue(p) == DependencyProperty.UnsetValue);
-            if (dependencyProperty == null)
+            avaloniaProperty = dependencyPropertys.FirstOrDefault(p => avaloniaObject.ReadLocalValue(p) == AvaloniaProperty.UnsetValue);
+            if (avaloniaProperty == null)
             {
-                dependencyProperty = DependencyProperty.RegisterAttached($"{dependencyObject.GetType().Name}{Guid.NewGuid()}",
+                avaloniaProperty = AvaloniaProperty.RegisterAttached($"{avaloniaObject.GetType().Name}{Guid.NewGuid()}",
                     typeof(object),
-                    dependencyObject.GetType(),
+                    avaloniaObject.GetType(),
                     new PropertyMetadata());
-                dependencyPropertys.Add(dependencyProperty);
+                dependencyPropertys.Add(avaloniaProperty);
             }
-            var resolvedValue = markup.ProvideValue(new ServiceProvider(dependencyObject, dependencyProperty));
-            dependencyObject.SetValue(dependencyProperty, resolvedValue);
+            var resolvedValue = markup.ProvideValue(new ServiceProvider(avaloniaObject, avaloniaProperty));
+            avaloniaObject.SetValue(avaloniaProperty, resolvedValue);
         }
     }
 }

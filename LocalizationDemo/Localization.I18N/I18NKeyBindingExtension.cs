@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Markup.Xaml;
+using Avalonia.Markup.Xaml.MarkupExtensions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using System.Windows;
-using System.Windows.Data;
-using System.Windows.Markup;
 
 namespace Localization.I18N
 {
@@ -23,17 +25,17 @@ namespace Localization.I18N
                 }
             }
 
-            public class MarkupArgument : BindingArgument
-            {
-                private MarkupReader markupReader;
+            //public class MarkupArgument : BindingArgument
+            //{
+            //    private MarkupReader markupReader;
 
-                public override object Value => markupReader.Value;
+            //    public override object Value => markupReader.Value;
 
-                public MarkupArgument(DependencyObject dependencyObject, MarkupExtension markup)
-                {
-                    markupReader = new MarkupReader(dependencyObject, markup);
-                }
-            }
+            //    public MarkupArgument(AvaloniaObject avaloniaObject, MarkupExtension markup)
+            //    {
+            //        markupReader = new MarkupReader(avaloniaObject, markup);
+            //    }
+            //}
 
             public abstract object Value { get; }
 
@@ -47,20 +49,20 @@ namespace Localization.I18N
             private readonly I18NKeys key;
             private IEnumerable<BindingArgument> bindingArgs;
 
-            public BindingData(I18NKeys key, IEnumerable<BindingArgument> bindingArgs, DependencyObject dependencyObject)
+            public BindingData(I18NKeys key, IEnumerable<BindingArgument> bindingArgs, AvaloniaObject avaloniaObject)
             {
                 this.key = key;
                 this.bindingArgs = bindingArgs;
-                if (dependencyObject != null)
+                if (avaloniaObject != null)
                 {
-                    Binding.AddTargetUpdatedHandler(dependencyObject, (s, e) =>
-                    {
-                        OnCultureChanged();
-                    });
-                    Binding.AddSourceUpdatedHandler(dependencyObject, (s, e) =>
-                    {
-                        OnCultureChanged();
-                    });
+                    //Binding.AddTargetUpdatedHandler(avaloniaObject, (s, e) =>
+                    //{
+                    //    OnCultureChanged();
+                    //});
+                    //Binding.AddSourceUpdatedHandler(avaloniaObject, (s, e) =>
+                    //{
+                    //    OnCultureChanged();
+                    //});
                 }
             }
             ~BindingData()
@@ -107,28 +109,29 @@ namespace Localization.I18N
         ~I18NKeyBindingExtension()
         {
         }
-
         [ConstructorArgument(nameof(Key))]
         public I18NKeys Key { get; set; }
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            DependencyObject dependencyObject = null;
+            AvaloniaObject avaloniaObject = null;
             List<BindingArgument> bindingArgs = new List<BindingArgument>();
             if (serviceProvider.GetService(typeof(IProvideValueTarget)) is IProvideValueTarget provideValueTarget &&
-                provideValueTarget.TargetObject is DependencyObject targetObject)
+                provideValueTarget.TargetObject is AvaloniaObject targetObject &&
+                provideValueTarget.TargetProperty is AvaloniaProperty targetProperty)
             {
-                dependencyObject = targetObject;
+                avaloniaObject = targetObject;
                 foreach (var arg in args)
                 {
                     if (arg is Binding b)
                     {
-                        b.NotifyOnTargetUpdated = true;
-                        bindingArgs.Add(new BindingArgument.MarkupArgument(dependencyObject, b));
+                        targetObject.Bind(targetProperty, b);
+                        var bb = targetObject.GetValue(targetProperty);
+
                     }
                     else if (arg is MarkupExtension markup)
                     {
-                        bindingArgs.Add(new BindingArgument.MarkupArgument(dependencyObject, markup));
+                        //bindingArgs.Add(new BindingArgument.MarkupArgument(avaloniaObject, markup));
                     }
                     else
                     {
@@ -136,9 +139,9 @@ namespace Localization.I18N
                     }
                 }
             }
-            var binding = new Binding(nameof(BindingData.Value))
+            var binding = new ReflectionBindingExtension(nameof(BindingData.Value))
             {
-                Source = new BindingData(Key, bindingArgs, dependencyObject),
+                Source = new BindingData(Key, bindingArgs, avaloniaObject),
                 Mode = BindingMode.OneWay
             };
             return binding.ProvideValue(serviceProvider);

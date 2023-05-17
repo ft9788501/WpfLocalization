@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Avalonia;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Windows;
 
 namespace Localization.I18N
 {
@@ -39,17 +39,18 @@ namespace Localization.I18N
 
             public override void OnCultureChanged()
             {
-                if (sender is DependencyObject dependencyObject)
-                {
-                    dependencyObject.Dispatcher.Invoke(() =>
-                    {
-                        propertyInfo?.SetValue(sender, Key.GetLocalizationString(FormatParams));
-                    });
-                }
-                else
-                {
-                    propertyInfo?.SetValue(sender, Key.GetLocalizationString(FormatParams));
-                }
+                propertyInfo?.SetValue(sender, Key.GetLocalizationString(FormatParams));
+                //if (sender is AvaloniaObject avaloniaObject)
+                //{
+                //    avaloniaObject.Dispatcher.Invoke(() =>
+                //    {
+                //        propertyInfo?.SetValue(sender, Key.GetLocalizationString(FormatParams));
+                //    });
+                //}
+                //else
+                //{
+                //    propertyInfo?.SetValue(sender, Key.GetLocalizationString(FormatParams));
+                //}
             }
 
             #endregion

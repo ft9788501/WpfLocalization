@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31105.61
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33627.172
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LocalizationDemo", "LocalizationDemo\LocalizationDemo.csproj", "{8F8143BE-2F30-4385-ACA2-E95BC50D5370}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Localization.I18N", "Localization.I18N\Localization.I18N.csproj", "{6ABCB3E6-0A80-418A-9D4E-192E4E8B95EF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaApplication1", "AvaloniaApplication1\AvaloniaApplication1.csproj", "{87073CCE-8BD2-4DBB-9BDC-488BC5D17FAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8F8143BE-2F30-4385-ACA2-E95BC50D5370}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{8F8143BE-2F30-4385-ACA2-E95BC50D5370}.Debug|Any CPU.Build.0 = Debug|x64
-		{8F8143BE-2F30-4385-ACA2-E95BC50D5370}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F8143BE-2F30-4385-ACA2-E95BC50D5370}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6ABCB3E6-0A80-418A-9D4E-192E4E8B95EF}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{6ABCB3E6-0A80-418A-9D4E-192E4E8B95EF}.Debug|Any CPU.Build.0 = Debug|x64
+		{6ABCB3E6-0A80-418A-9D4E-192E4E8B95EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6ABCB3E6-0A80-418A-9D4E-192E4E8B95EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6ABCB3E6-0A80-418A-9D4E-192E4E8B95EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6ABCB3E6-0A80-418A-9D4E-192E4E8B95EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87073CCE-8BD2-4DBB-9BDC-488BC5D17FAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87073CCE-8BD2-4DBB-9BDC-488BC5D17FAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87073CCE-8BD2-4DBB-9BDC-488BC5D17FAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87073CCE-8BD2-4DBB-9BDC-488BC5D17FAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
