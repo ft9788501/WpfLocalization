@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -10,7 +11,6 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
-using System.Windows.Resources;
 
 namespace Localization.I18N
 {
@@ -23,20 +23,9 @@ namespace Localization.I18N
 
         private static readonly Dictionary<CultureInfo, CultureInfo> defaultCultureMap = new Dictionary<CultureInfo, CultureInfo>
         {
-            { CultureInfo.GetCultureInfo("zh-HK"), CultureInfo.GetCultureInfo("zh-TW") },
-            { CultureInfo.GetCultureInfo("en-AU"), CultureInfo.GetCultureInfo("en-GB") },
-            { CultureInfo.GetCultureInfo("en"), CultureInfo.GetCultureInfo("en-US") },
-            { CultureInfo.GetCultureInfo("de"), CultureInfo.GetCultureInfo("de-DE") },
-            { CultureInfo.GetCultureInfo("es"), CultureInfo.GetCultureInfo("es-419") },
-            { CultureInfo.GetCultureInfo("fr"), CultureInfo.GetCultureInfo("fr-FR") },
-            { CultureInfo.GetCultureInfo("it"), CultureInfo.GetCultureInfo("it-IT") },
-            { CultureInfo.GetCultureInfo("ja"), CultureInfo.GetCultureInfo("ja-JP") },
-            { CultureInfo.GetCultureInfo("pt"), CultureInfo.GetCultureInfo("pt-BR") },
-            { CultureInfo.GetCultureInfo("zh"), CultureInfo.GetCultureInfo("zh-CN") },
-            { CultureInfo.GetCultureInfo("nl"), CultureInfo.GetCultureInfo("nl-NL") },
-            { CultureInfo.GetCultureInfo("ko"), CultureInfo.GetCultureInfo("ko-KR") },
         };
         internal static Dictionary<I18NKeys, I18NValue> nonLocalizedMap = new Dictionary<I18NKeys, I18NValue>();
+        internal static Dictionary<I18NKeys, I18NValue> i18nMapDefault = new Dictionary<I18NKeys, I18NValue>();
         internal static Dictionary<I18NKeys, I18NValue> i18nMap = new Dictionary<I18NKeys, I18NValue>();
 
         public static bool EnablePseudo
@@ -62,12 +51,16 @@ namespace Localization.I18N
                 }
                 currentCulture = value;
                 using Stream nonLocalizedJsonStream = GetStreamByCultureName("non-localized");
-                using Stream cultureJsonStream = GetStreamByCultureName(value.Name);
+                using Stream defaultCultureJsonStream = I18NManager.GetStreamByCultureName("en");
+                using Stream cultureJsonStream = GetStreamByCultureName(currentCulture.Name);
                 using StreamReader nonLocalizedJsonStreamReader = new StreamReader(nonLocalizedJsonStream, Encoding.UTF8);
+                using StreamReader defaultCultureJsonStreamReader = new StreamReader(defaultCultureJsonStream, Encoding.UTF8);
                 using StreamReader cultureJsonStreamReader = new StreamReader(cultureJsonStream, Encoding.UTF8);
                 string nonLocalizedJson = nonLocalizedJsonStreamReader.ReadToEnd();
+                string defaultCultureJson = defaultCultureJsonStreamReader.ReadToEnd();
                 string cultureJson = cultureJsonStreamReader.ReadToEnd();
-                LoadFromJson(nonLocalizedJson, cultureJson);
+                LoadFromJson(nonLocalizedJson, defaultCultureJson, cultureJson);
+                OnCultureChanged();
             }
         }
 
@@ -110,14 +103,11 @@ namespace Localization.I18N
                 {
                     return FixCultureInfo(sameCultureInfo);
                 }
-                else if (defaultCultureMap.TryGetValue(CultureInfo.GetCultureInfo(culture.TwoLetterISOLanguageName), out CultureInfo sameParentCultureInfo) && culture.Name != sameParentCultureInfo.Name)
+                if (culture.Name == culture.TwoLetterISOLanguageName)
                 {
-                    return FixCultureInfo(sameParentCultureInfo);
+                    return FixCultureInfo(CultureInfo.GetCultureInfo("en"));
                 }
-                else
-                {
-                    return FixCultureInfo(CultureInfo.GetCultureInfo("en-US"));
-                }
+                return FixCultureInfo(CultureInfo.GetCultureInfo(culture.TwoLetterISOLanguageName));
             }
             else
             {
@@ -125,39 +115,79 @@ namespace Localization.I18N
             }
         }
 
-        private static bool LoadFromJson(string nonLocalizedJson, string cultureJson)
+        private static bool LoadFromJson(string nonLocalizedJson, string defaultCultureJson, string cultureJson)
         {
             try
             {
-                Dictionary<I18NKeys, I18NValue> nonLocalizedMap = new Dictionary<I18NKeys, I18NValue>();
-                Dictionary<I18NKeys, I18NValue> i18nMap = new Dictionary<I18NKeys, I18NValue>();
-                var nonLocalizedJsonDictionary = JsonSerializer.Deserialize<Dictionary<string, object>[]>(nonLocalizedJson);
-                var cultureJsonDictionary = JsonSerializer.Deserialize<Dictionary<string, object>[]>(cultureJson);
+                nonLocalizedMap.Clear();
+                i18nMapDefault.Clear();
+                i18nMap.Clear();
+                var nonLocalizedJsonDictionary = GetLocalizationMap(nonLocalizedJson);
+                var defaultCultureJsonDictionary = GetLocalizationMap(defaultCultureJson);
+                var cultureJsonDictionary = GetLocalizationMap(cultureJson);
                 Trace.WriteLine($"Load from json culture [nonLocalized:{nonLocalizedJsonDictionary.Count()}|culture:{cultureJsonDictionary.Count()}]");
                 foreach (var property in nonLocalizedJsonDictionary)
                 {
-                    var key = property["Key"].ToString();
-                    if (I18NValue.CreateI18NValue(property) is I18NValue value)
+                    var key = $"NonLocalized_{property.Key}";
+                    if (Enum.TryParse(key, out I18NKeys i18NKey) && I18NValue.CreateI18NValue(property) is I18NValue value)
                     {
-                        nonLocalizedMap.Add(Enum.Parse<I18NKeys>(key), value);
+                        nonLocalizedMap.Add(i18NKey, value);
                     }
                 }
-                I18NManager.nonLocalizedMap = nonLocalizedMap;
+                foreach (var property in defaultCultureJsonDictionary)
+                {
+                    var key = property.Key;
+                    if (Enum.TryParse(key, out I18NKeys i18NKey) && I18NValue.CreateI18NValue(property) is I18NValue value)
+                    {
+                        i18nMapDefault.Add(i18NKey, value);
+                    }
+                }
                 foreach (var property in cultureJsonDictionary)
                 {
-                    var key = property["Key"].ToString();
-                    if (I18NValue.CreateI18NValue(property) is I18NValue value)
+                    var key = property.Key;
+                    if (Enum.TryParse(key, out I18NKeys i18NKey) && I18NValue.CreateI18NValue(property) is I18NValue value)
                     {
-                        i18nMap.Add(Enum.Parse<I18NKeys>(key), value);
+                        i18nMap.Add(i18NKey, value);
                     }
                 }
-                I18NManager.i18nMap = i18nMap;
-                OnCultureChanged();
                 return true;
             }
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        private static IEnumerable<KeyValuePair<string, object>> GetLocalizationMap(string? jsonContent, string? parentKey = null)
+        {
+            if (jsonContent != null)
+            {
+                var jsonObjects = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonContent);
+                if (jsonObjects != null)
+                {
+                    foreach (var jsonObject in jsonObjects)
+                    {
+                        var key = (parentKey == null ? "" : $"{parentKey}_") + jsonObject.Key;
+                        if (jsonObject.Key == "Plurals" && parentKey != null)
+                        {
+                            var plurals = Plurals.LoadFromJson(jsonObject.Value.ToString());
+                            if (plurals != null)
+                            {
+                                yield return new KeyValuePair<string, object>(parentKey, plurals);
+                            }
+                            continue;
+                        }
+                        if (jsonObject.Value is string value)
+                        {
+                            yield return new KeyValuePair<string, object>(key, value);
+                            continue;
+                        }
+                        foreach (var item in GetLocalizationMap(jsonObject.Value.ToString(), key))
+                        {
+                            yield return item;
+                        }
+                    }
+                }
             }
         }
 

@@ -5,76 +5,62 @@
 <#@ assembly name="EnvDte" #>
 <#@ assembly name="Newtonsoft.Json" #><# //There is a bug in System.Text.Json #>
 <#@ import namespace="Newtonsoft.Json" #>
+<#@ import namespace="Newtonsoft.Json.Linq" #>
 <#@ import namespace="System.IO" #>
 <#@ import namespace="System.Collections.Generic" #>
+<#
+string jsonNonLocalized = File.ReadAllText(this.Host.ResolvePath("I18NResources/non-localized.json"));
+string jsonEn = File.ReadAllText(this.Host.ResolvePath("I18NResources/en.json"));
+
+var localizationKeyNonLocalized =  GetLocalizationKey(jsonNonLocalized);
+var localizationKeyEn =  GetLocalizationKey(jsonEn);
+  
+IEnumerable<KeyValuePair<string, string>> GetLocalizationKey(string? jsonContent, string? parentKey = null)
+{
+    if (jsonContent != null)
+    {
+        var jsonObjects = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonContent);
+        if (jsonObjects != null)
+        {
+            foreach (var jsonObject in jsonObjects)
+            {
+                var key = (parentKey == null ? "" : $"{parentKey}_") + jsonObject.Key;
+                if (jsonObject.Key == "Plurals" && parentKey != null)
+                {
+                    var pluralsValue = (jsonObject.Value.ToString() ?? string.Empty).Replace('\r', ' ').Replace('\n', ' ');
+                    yield return new KeyValuePair<string, string>(parentKey, pluralsValue);
+                    continue;
+                }
+                if (jsonObject.Value is string value)
+                {
+                    yield return new KeyValuePair<string, string>(key, value);
+                    continue;
+                }
+                foreach (var item in GetLocalizationKey(jsonObject.Value.ToString(), key))
+                {
+                    yield return item;
+                }
+            }
+        }
+    }
+}
+#>
 namespace Localization.I18N
 {
     // This is an auto-generated file. Do not modify this file manually, if you need to modify the contents, Please motify the I18NKeys.tt file.
     public enum I18NKeys
     {
 <#
-    string jsonNonLocalized = File.ReadAllText(this.Host.ResolvePath("I18NResources/non-localized.json"));
-    string jsonEn = File.ReadAllText(this.Host.ResolvePath("I18NResources/en-US.json"));
-    var jsonNonLocalizedStr = JsonConvert.DeserializeObject<Dictionary<string, object>[]>(jsonNonLocalized);
-    var jsonEnStr = JsonConvert.DeserializeObject<Dictionary<string, object>[]>(jsonEn);
-    WriteEnum("[Non-Localized] ",jsonNonLocalizedStr);
-    WriteEnum("",jsonEnStr);
-#>
-    }
-}
-<#
-void WriteEnum(string head, Dictionary<string, object>[] dictionary)
-{
-    foreach (var item in dictionary)
+    foreach (var item in localizationKeyNonLocalized)
     {
-        var key = item["Key"].ToString();
-        if (item.ContainsKey("Value"))
-        {
-            var value = item["Value"].ToString();
-            value = value.Replace("\n","\\n");
-            value = value.Replace("\r","\\r");
-            WriteLine($"        /// <summary>{head}{value}</summary>");
-            WriteLine($"        {key},");
-            continue;
-        }
-        if (item.ContainsKey("Plurals"))
-        {
-            var plurals = JsonConvert.DeserializeObject<Dictionary<string, string>[]>(item["Plurals"].ToString());
-            WriteLine($"        /// <summary>{head}This is a plurals value</summary>");
-            WriteLine($"        /// <remarks>");
-            foreach (var plural in plurals)
-            {
-                var quantity = plural["Quantity"];
-                var value = plural["Value"];
-                value = value.Replace("\n","\\n");
-                value = value.Replace("\r","\\r");
-                WriteLine($"        /// <para>");
-                WriteLine($"        /// [{quantity}]: {value}");
-                WriteLine($"        /// </para>");
-            }
-            WriteLine($"        /// </remarks>");
-            WriteLine($"        {key},");
-            continue;
-        }
-        if (item.ContainsKey("Time"))
-        {
-            var time = JsonConvert.DeserializeObject<Dictionary<string, string>[]>(item["Time"].ToString());
-            WriteLine($"        /// <summary>{head}This is a time value</summary>");
-            WriteLine($"        /// <remarks>");
-            foreach (var t in time)
-            {
-                var unit = t["Unit"];
-                var value = t["Value"];
-                value = value.Replace("\n","\\n");
-                value = value.Replace("\r","\\r");
-                WriteLine($"        /// <para>");
-                WriteLine($"        /// [{unit}]: {value}");
-                WriteLine($"        /// </para>");
-            }
-            WriteLine($"        /// </remarks>");
-            WriteLine($"        {key},");
-            continue;
-        }
+        WriteLine($"        /// <summary>[NonLocalized] {item.Value}</summary>");
+        WriteLine($"        NonLocalized_{item.Key},");
+    }
+    foreach (var item in localizationKeyEn)
+    {
+        WriteLine($"        /// <summary>{item.Value}</summary>");
+        WriteLine($"        {item.Key},");
+    }
+#>
     }
 }
-#>

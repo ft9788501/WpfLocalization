@@ -1,0 +1,15 @@
+{
+  "Title": "title",
+  "Name": "name",
+  "Age": "12",
+  "MessageBox": "MessageBox",
+  "ShowNewWindow": "Show New Window",
+  "NewWindowTitle": "newWindowTitle",
+  "Success": "Success",
+  "String1": "this is string start",
+  "String2": "this is string end",
+  "SpeakingIndicatorSpeaking": "is Speaking",
+  "SpeakingIndicatorReconnecting": "is Reconnecting",
+  "FormatString": "This is a {l_old device} and will switch to {l_new device} .",
+  "Version": "Version ({l_version number})."
+}

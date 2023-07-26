@@ -3,45 +3,22 @@
     // This is an auto-generated file. Do not modify this file manually, if you need to modify the contents, Please motify the I18NKeys.tt file.
     public enum I18NKeys
     {
-        /// <summary>[Non-Localized] This is a time value</summary>
-        /// <remarks>
-        /// <para>
-        /// [Ms]: Meeting will end after {l_seconds} Milliseconds
-        /// </para>
-        /// <para>
-        /// [Sec]: Meeting will end after {l_seconds} Seconds
-        /// </para>
-        /// <para>
-        /// [Min]: Meeting will end after {l_seconds} Minute
-        /// </para>
-        /// </remarks>
-        TestTimeString,
-        /// <summary>[Non-Localized] This is a plurals value</summary>
-        /// <remarks>
-        /// <para>
-        /// [One]: This is {l_participant_number} participant
-        /// </para>
-        /// <para>
-        /// [Few]: There are {l_participant_number} participants
-        /// </para>
-        /// </remarks>
-        TestPluralsString,
-        /// <summary>[Non-Localized] Ringcentral</summary>
-        MainWindowTitle,
-        /// <summary>[Non-Localized] Environment</summary>
-        SimulationEnvironment,
-        /// <summary>[Non-Localized] Log</summary>
-        SimulationLog,
-        /// <summary>[Non-Localized] Info</summary>
-        SimulationInfo,
-        /// <summary>[Non-Localized] Meeting</summary>
-        SimulationMeeting,
-        /// <summary>[Non-Localized] MeetingId</summary>
-        SimulationMeetingId,
-        /// <summary>[Non-Localized] Setting</summary>
-        SimulationSetting,
-        /// <summary>[Non-Localized] https://v.ringcentral.com/share</summary>
-        RingCentralShareUrl,
+        /// <summary>[NonLocalized] {    "One": "This is {l_participant_number} participant",    "Few": "There are {l_participant_number} participants"  }</summary>
+        NonLocalized_TestPlurals,
+        /// <summary>[NonLocalized] Ringcentral</summary>
+        NonLocalized_MainWindowTitle,
+        /// <summary>[NonLocalized] Environment</summary>
+        NonLocalized_SimulationEnvironment,
+        /// <summary>[NonLocalized] Log</summary>
+        NonLocalized_SimulationLog,
+        /// <summary>[NonLocalized] Info</summary>
+        NonLocalized_SimulationInfo,
+        /// <summary>[NonLocalized] Meeting</summary>
+        NonLocalized_SimulationMeeting,
+        /// <summary>[NonLocalized] MeetingId</summary>
+        NonLocalized_SimulationMeetingId,
+        /// <summary>[NonLocalized] Setting</summary>
+        NonLocalized_SimulationSetting,
         /// <summary>title</summary>
         Title,
         /// <summary>name</summary>

@@ -1,64 +1,15 @@
-[
-  {
-    "Key": "TestTimeString",
-    "Time": [
-      {
-        "Unit": "Ms",
-        "Value": "Meeting will end after {l_seconds} Milliseconds"
-      },
-      {
-        "Unit": "Sec",
-        "Value": "Meeting will end after {l_seconds} Seconds"
-      },
-      {
-        "Unit": "Min",
-        "Value": "Meeting will end after {l_seconds} Minute"
-      }
-    ]
+{
+  "TestPlurals": {
+    "Plurals": {
+      "One": "This is {l_participant_number} participant",
+      "Few": "There are {l_participant_number} participants"
+    }
   },
-  {
-    "Key": "TestPluralsString",
-    "Plurals": [
-      {
-        "Quantity": "One",
-        "Value": "This is {l_participant_number} participant"
-      },
-      {
-        "Quantity": "Few",
-        "Value": "There are {l_participant_number} participants"
-      }
-    ]
-  },
-  {
-    "Key": "MainWindowTitle",
-    "Value": "Ringcentral"
-  },
-  {
-    "Key": "SimulationEnvironment",
-    "Value": "Environment"
-  },
-  {
-    "Key": "SimulationLog",
-    "Value": "Log"
-  },
-  {
-    "Key": "SimulationInfo",
-    "Value": "Info"
-  },
-  {
-    "Key": "SimulationMeeting",
-    "Value": "Meeting"
-  },
-  {
-    "Key": "SimulationMeetingId",
-    "Value": "MeetingId"
-  },
-  {
-    "Key": "SimulationSetting",
-    "Value": "Setting"
-  },
-  {
-    "Key": "RingCentralShareUrl",
-    "Value": "https://v.ringcentral.com/share"
-  }
-]
+  "MainWindowTitle": "Ringcentral",
+  "SimulationEnvironment": "Environment",
+  "SimulationLog": "Log",
+  "SimulationInfo": "Info",
+  "SimulationMeeting": "Meeting",
+  "SimulationMeetingId": "MeetingId",
+  "SimulationSetting": "Setting",
+}

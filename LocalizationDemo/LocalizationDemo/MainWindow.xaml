@@ -33,12 +33,7 @@
             <StackPanel  Background="LightCyan">
                 <TextBlock Text="Plurals"/>
                 <TextBox Text="{Binding Number,UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="{i18n:I18NKeyBinding {Binding Number},Key=TestPluralsString}"/>
-            </StackPanel>
-            <StackPanel  Background="LightGreen">
-                <TextBlock Text="Time"/>
-                <TextBox Text="{Binding Time,UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="{i18n:I18NKeyBinding {Binding Time},Key=TestTimeString}"/>
+                <TextBlock Text="{i18n:I18NKeyBinding {Binding Number},Key=NonLocalized_TestPlurals}"/>
             </StackPanel>
         </StackPanel>
         <StackPanel Width="150" VerticalAlignment="Top" HorizontalAlignment="Right">
